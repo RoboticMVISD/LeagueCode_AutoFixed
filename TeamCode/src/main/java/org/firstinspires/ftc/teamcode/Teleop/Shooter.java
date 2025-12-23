@@ -8,12 +8,15 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Autonomous.LogitecAutoAim;
+
 public class Shooter {
     //Initializes all variables required to shoot. Motors on turret, blocker servos, and turret CRServo
     static OpMode op;
     public static DcMotorEx leftShooter, rightShooter;
     public static CRServo turretRotator;
     static Servo blocker;
+    LogitecAutoAim autoAim = new LogitecAutoAim();
 
 
     //Velocity Tester increments for shooterTesterConTwo()
@@ -67,26 +70,18 @@ public class Shooter {
     }
 
     public void shooterConTwo(){
-        if (op.gamepad2.y){
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_LONGRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_LONGRANGE);
-        }else if (op.gamepad2.b){
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_MEDIUMRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_MEDIUMRANGE);
-        } else if (op.gamepad2.a) {
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_SHORTRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_SHORTRANGE);
-        }else if (op.gamepad2.left_bumper){
-            leftShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE *0.5);
-            rightShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE *0.5);
-        }else if (op.gamepad2.x){
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_XLRANGE);
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_XLRANGE);
-        }else {
-            rightShooter.setPower(0);
-            leftShooter.setPower(0);
+        if (op.gamepad2.a){
+            autoAim.launcherRequested = true;
+        } else {
+            autoAim.launcherRequested = false;
         }
         op.telemetry.addLine("Spin Power: " + rightShooter.getVelocity());
+
+        if (op.gamepad2.dpad_up) {
+            autoAim.aimEnabled = true;
+        } else {
+            autoAim.aimEnabled = false;
+        }
     }
 
     public void shooterConOne(){
