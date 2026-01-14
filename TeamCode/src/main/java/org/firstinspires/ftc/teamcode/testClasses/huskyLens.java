@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.testClasses;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorHuskyLens;
+import org.firstinspires.ftc.teamcode.Teleop.Shooter;
 
 public class huskyLens {
 

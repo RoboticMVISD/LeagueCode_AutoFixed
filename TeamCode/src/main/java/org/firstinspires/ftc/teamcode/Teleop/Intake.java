@@ -10,7 +10,7 @@ public class Intake {
     public static DcMotor intake, secondaryIntake;
 
     final double INTAKE_MOTOR_SPEED = .8;
-    double SECONDARY_INTAKE_SPEED = .8;
+    double SECONDARY_INTAKE_SPEED = 1;
 
 
     public static void init(OpMode OP){

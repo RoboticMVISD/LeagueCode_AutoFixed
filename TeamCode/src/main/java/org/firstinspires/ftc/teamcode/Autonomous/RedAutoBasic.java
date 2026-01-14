@@ -7,27 +7,28 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Teleop.Intake;
 import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
 import org.firstinspires.ftc.teamcode.Teleop.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous (name = "3ballAutoBlue")
-public class simplePedroAutoBlue extends OpMode {
-
-    Follower follower;
-    Timer pathTimer, opModeTimer;
-    Boolean isShooting;
+@Autonomous (name = "RedAuto3B")
+public class RedAutoBasic extends OpMode{
+    private Follower follower;
+    private OpMode op;
+    private Timer pathTimer, opModeTimer;
+    private Boolean isShooting;
 
     private enum PathStateOne {
         DRIVE_GETTING_INTO_SHOOT_POS,
         SHOOT_PRELOAD,
     }
     private PathStateOne pathStateOne;
-    private final Pose startPose = new Pose(21.004207573632538, 123.60168302945301, Math.toRadians(135));
-    private final Pose shootPose = new Pose(43.22019635343619, 100.17391304347825, Math.toRadians(135));
-    private final Pose park = new Pose(18.378681626928472, 100.77980364656382, Math.toRadians(270));
+    private final Pose startPose = new Pose(123.72119487908962, 122.9018492176387, Math.toRadians(45));
+    private final Pose shootPose = new Pose(99.34566145092461, 98.73115220483643, Math.toRadians(45));
+    private final Pose park = new Pose(124.13086770981508, 101.59886201991465, Math.toRadians(270));
     private PathChain shootFirstThree, parkBot;
 
     private void setPathStateOne(PathStateOne newState) {
@@ -78,8 +79,6 @@ public class simplePedroAutoBlue extends OpMode {
                 .build();
         return path;
     }
-
-
     private void buildPaths(){
         //For Preload Shoot and Park
         shootFirstThree = newPathLine(startPose, shootPose);
@@ -95,6 +94,7 @@ public class simplePedroAutoBlue extends OpMode {
         Intake.init(this);
         Shooter.init(this);
         MovementSystem.init(this);
+        op = this;
 
         buildPaths();
         follower.setPose(startPose);
