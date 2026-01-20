@@ -108,6 +108,7 @@ public class AutoAimJ {
             turnPower = elevation * SPEED_GAIN;
             Shooter.turretRotator.setPower(-turnPower);
 
+
             if (range < 90){
             if (elevation >= minimumBoundryClose && elevation <= maximumBoundryClose){
                 Shooter.turretRotator.setPower(0);
