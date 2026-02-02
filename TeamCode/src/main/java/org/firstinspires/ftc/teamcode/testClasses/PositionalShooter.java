@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.testClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.AutoAim;
 import org.firstinspires.ftc.teamcode.AutoAimJ;
 import org.firstinspires.ftc.teamcode.Teleop.Main;
 
-public class Shooter {
+public class PositionalShooter {
     //Initializes all variables required to shoot. Motors on turret, blocker servos, and turret CRServo
     static OpMode op;
     public static DcMotorEx leftShooter, rightShooter;
@@ -30,8 +30,8 @@ public class Shooter {
     public static double SPIN_UP_VELOCITY_LONGRANGE = 1225;
     public static double SPIN_UP_VELOCITY_XLRANGE = 1550;
     public static double BALL_REVERSE_SPEED = -500;
-    public static double TURRET_ROTATE_SPEED = 0.15;
-    public static double TURRET_ROTATE_SPEED_FAST = .4;
+    public static double TURRET_ROTATE_SPEED = 0.01;
+    public static double TURRET_ROTATE_SPEED_FAST = 0.05;
 
     //PIDF Variables
     public static double proportional = 300;
@@ -59,7 +59,6 @@ public class Shooter {
         rightShooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
         turretRotator = op.hardwareMap.servo.get("turretRotator");
-        turretRotator.setDirection(Servo.Direction.REVERSE);
 
         blocker = op.hardwareMap.servo.get("blocker");
         blocker.setDirection(Servo.Direction.REVERSE);
@@ -83,7 +82,7 @@ public class Shooter {
         } else if (op.gamepad2.x) {
             leftShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
             rightShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
-        } else {
+        } else if(!Main.posAutoAim.launcherRequested) {
             rightShooter.setPower(0);
             leftShooter.setPower(0);
         }
@@ -99,16 +98,16 @@ public class Shooter {
     }
 
     public void rotateTurret() {
+        double currentTurretPosition = turretRotator.getPosition();
+
         if (op.gamepad2.right_trigger > 0) {
-            turretRotator.setPosition(1);
+            turretRotator.setPosition(currentTurretPosition + TURRET_ROTATE_SPEED_FAST);
         } else if (op.gamepad2.left_trigger > 0) {
-            turretRotator.setPosition(-1);
+            turretRotator.setPosition(currentTurretPosition - TURRET_ROTATE_SPEED_FAST);
         } else if (op.gamepad2.left_bumper){
-            turretRotator.setPosition(-.5);
+            turretRotator.setPosition(currentTurretPosition + TURRET_ROTATE_SPEED);
         }else if (op.gamepad2.right_bumper){
-            turretRotator.setPosition(0);
-        }else {
-            turretRotator.setPosition(.5);
+            turretRotator.setPosition(currentTurretPosition - TURRET_ROTATE_SPEED);
         }
     }
 
@@ -138,12 +137,5 @@ public class Shooter {
     public static void setShooterPower(double Vel) {
         leftShooter.setVelocity(Vel);
         rightShooter.setVelocity(Vel);
-    }
-
-    public static void setShooterPower(double Vel, double shooterTurretPos){
-        leftShooter.setVelocity(Vel);
-        rightShooter.setVelocity(Vel);
-        turretRotator.setPosition(shooterTurretPos);
-
     }
 }

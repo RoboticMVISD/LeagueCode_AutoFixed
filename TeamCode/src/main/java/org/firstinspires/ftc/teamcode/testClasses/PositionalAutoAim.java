@@ -1,5 +1,5 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testClasses;
 
 import android.util.Size;
 import java.lang.Math;
@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 import java.util.List;
-public class AutoAim {
+public class PositionalAutoAim {
 
     private static final boolean USE_WEBCAM = true;
 
@@ -39,7 +39,7 @@ public class AutoAim {
     public static boolean launcherRequested = false;
     public static boolean refindGoalAttempted = true;
 
-    static final private double turnMultiplier = 1.75;
+    static final private double turnMultiplier = 2;
     static final private double launchMultiplier = 7.15;
     static final private double launchOffset = 756.68282;
     static final private double closeBoundary = 2;
@@ -69,6 +69,7 @@ public class AutoAim {
         telemetryAprilTag();
         aimTurret();
         autoDistance();
+        conTwoAutoAimAndDistanceControls();
 
         op.telemetry.addData("Current Goal", currentGoalTag);
         op.telemetry.addData("Current Obelisk", currentObeliskTag);
@@ -82,24 +83,23 @@ public class AutoAim {
     }
 
     public static void aimTurret(){
-     /*   if (aimEnabled) {
+        if (aimEnabled) {
             try {
                 positionTurret();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         } else {
-            Shooter.turretRotator.setPower(0);
             indicatorLight.setPosition(0.388);
-        }*/
+        }
     }
 
     public static void autoDistance(){
         if (launcherRequested) {
             setLauncherPower();
         } else {
-            Shooter.leftShooter.setVelocity(0);
-            Shooter.rightShooter.setVelocity(0);
+            PositionalShooter.leftShooter.setVelocity(0);
+            PositionalShooter.rightShooter.setVelocity(0);
         }
     }
 
@@ -213,33 +213,11 @@ public class AutoAim {
      * using the turret rotator, position the turret to the proper horizontal angle for the goal.
      */
     public static void positionTurret() throws InterruptedException {
-/*
-        rotateDuration = (Math.abs(currentGoalElevation) / turnPower) * turnMultiplier;
+        double currentTurretPosition = PositionalShooter.turretRotator.getPosition();
 
-        if((currentGoalElevation != -1) && !noTagDetected){
-            if (currentGoalElevation > 0) {
-                Shooter.turretRotator.setPower(-turnPower);
-            } else {
-                Shooter.turretRotator.setPower(turnPower);
-            }
-            Thread.sleep((long) rotateDuration);
-            Shooter.turretRotator.setPower(0);
+        currentTurretPosition = currentTurretPosition + (currentGoalElevation / 500);
 
-            refindGoalAttempted = false;
-        } else if (noTagDetected && !refindGoalAttempted){
-            if (currentGoalElevation > 0) {
-                //bearingServo.setPower(turnPower);
-            } else {
-               //. bearingServo.setPower(-turnPower);
-            }
-            Thread.sleep(250);
-
-            Shooter.turretRotator.setPower(0);
-
-            refindGoalAttempted = true;
-        } else {
-            Shooter.turretRotator.setPower(0);
-        }
+        PositionalShooter.turretRotator.setPosition(currentTurretPosition);
 
         targetLocked = currentGoalElevation < closeBoundary && currentGoalElevation > -closeBoundary && !noTagDetected;
 
@@ -247,14 +225,23 @@ public class AutoAim {
             indicatorLight.setPosition(0.500);
         } else {
             indicatorLight.setPosition(0.290);
-        }*/
+        }
     }
 
     private static void setLauncherPower() {
-        Shooter.leftShooter.setVelocity(targetLaunchVelocity);
-        Shooter.rightShooter.setVelocity(targetLaunchVelocity);
+        PositionalShooter.leftShooter.setVelocity(targetLaunchVelocity);
+        PositionalShooter.rightShooter.setVelocity(targetLaunchVelocity);
     }
 
+    public static void conTwoAutoAimAndDistanceControls(){
+        if (op.gamepad2.dpad_left){
+            launcherRequested = false;
+        } else if (op.gamepad2.dpad_right){
+            launcherRequested = true;
+        } else if (op.gamepad2.dpad_up){
+            aimEnabled = true;
+        } else if (op.gamepad2.dpad_down){
+            aimEnabled = false;
+        }
+    }
 }
-
- /**/

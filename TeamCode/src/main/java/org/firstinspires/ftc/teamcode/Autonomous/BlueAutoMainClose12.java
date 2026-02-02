@@ -14,12 +14,10 @@ import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
 import org.firstinspires.ftc.teamcode.Teleop.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 
 //TIMES:
-@Autonomous (name = "RedAutoMain12B")
-public class RedAutoTest extends OpMode{
+@Autonomous (name = "BlueAutoMain12")
+public class BlueAutoMainClose12 extends OpMode{
 
     /*
     How this auto will work code wise is that it will have three separate methods which hold case statements.
@@ -35,16 +33,21 @@ public class RedAutoTest extends OpMode{
         DRIVE_GETTING_INTO_SHOOT_POS,
         SHOOT_PRELOAD,
         DRIVE_1ST_ROW_POS,
+        HIT_LEVER,
+        SET_UP_LEVER_HIT,
         DRIVE_RESET_MID_ONE,
         SHOOT_FIRST_ROW;
 
     }
     private PathStateOne pathStateOne;
-    private final Pose startPose = new Pose(128.073732718894, 111.92626728110596, Math.toRadians(0));
-    private final Pose shootPose = new Pose(102.230, 101.032, Math.toRadians(0));
-    private final Pose rowOneStart = new Pose(102.820, 84.17972350230413, Math.toRadians(0));
-    private final Pose rowOneEnd = new Pose(129.5, 84.17972350230413  , Math.toRadians(0));
-    private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne;
+    private final Pose startPose = new Pose(32.074, 111.92626728110596, Math.toRadians(180));
+    private final Pose shootPose = new Pose(55, 98, Math.toRadians(130));
+    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(125));
+    private final Pose preHitLever = new Pose(45.5, 70.57972350230413, Math.toRadians(90));
+    private final Pose hitLeverPose = new Pose(29.5, 70.57972350230413, Math.toRadians(90));
+    private final Pose rowOneStart = new Pose(56, 82.57972350230413, Math.toRadians(180));
+    private final Pose rowOneEnd = new Pose(34.5, 82.57972350230413  , Math.toRadians(180));
+    private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
 
 
 
@@ -57,8 +60,8 @@ public class RedAutoTest extends OpMode{
         SHOOT_SECOND_ROW
     }
     private PathStateTwo pathStateTwo;
-    private final Pose rowTwoStart = new Pose(99.76036866359446, 54.866359447004605, Math.toRadians(0));
-    private final Pose rowTwoEnd = new Pose(133.04608294930875, 54.39631336405527, Math.toRadians(0));
+    private final Pose rowTwoStart = new Pose(56, 58.866359447004605, Math.toRadians(180));
+    private final Pose rowTwoEnd = new Pose(26.954, 58.39631336405527, Math.toRadians(180));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -73,9 +76,10 @@ public class RedAutoTest extends OpMode{
         DRIVE_PARK
     }
     private PathStateThree pathStateThree;
-    private final Pose rowThreeStart = new Pose(99.76036866359446, 36.5529953917, Math.toRadians(0));
-    private final Pose rowThreeEnd = new Pose(133.04608294930875, 36.5529953917, Math.toRadians(0));
-    private final Pose parkPose = new Pose(94.72089761570828, 63.82047685834502, Math.toRadians(270));
+    private final Pose rowThreeStart = new Pose(56, 35.5529953917, Math.toRadians(180));
+    private final Pose rowThreeEnd = new Pose(26.954, 35.5529953917, Math.toRadians(180));
+    private final Pose backUpSpot = new Pose(17.952, 33.5529953917, Math.toRadians(180));
+    private final Pose parkPose = new Pose(44.5, 63.82047685834502, Math.toRadians(270));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
 
     private Timer pathTimer, opModeTimer;
@@ -102,52 +106,67 @@ public class RedAutoTest extends OpMode{
         shootFirstThree = newPathLine(startPose, shootPose);
         getIntoRowOnePos = newPathLine(shootPose, rowOneStart);
         getFirstRow = newPathLine(rowOneStart, rowOneEnd);
-        resetBackOne = newPathLine(rowOneEnd, shootPose);
+        readyToHitLever = newPathLine(rowOneEnd, preHitLever);
+        hitLever = newPathLine(preHitLever, hitLeverPose);
+        resetBackOne = newPathLine(hitLeverPose, shootPoseEX);
 
         //For Row Two
         getIntoRowTwo = newPathLine(shootPose, rowTwoStart);
         getRowTwo = newPathLine(rowTwoStart, rowTwoEnd);
         backUpRowTwo = newPathLine(rowTwoEnd, rowTwoStart);
-        resetBackTwo = newPathLine(rowTwoStart, shootPose);
+        resetBackTwo = newPathLine(rowTwoStart, shootPoseEX);
 
         //For Row Three and Park
         getIntoRowThree = newPathLine(shootPose,rowThreeStart);
         getRowThree = newPathLine(rowThreeStart, rowThreeEnd);
-        resetBackThree = newPathLine(rowThreeEnd, shootPose);
+        resetBackThree = newPathLine(rowThreeEnd, shootPoseEX);
         park = newPathLine(shootPose, parkPose);
     }
 
     //Method/Switch statement for shooting preload and getting row one & shooting. WORKS
     private void pathStateUpdateOne(){
         switch (pathStateOne) {
-            case DRIVE_GETTING_INTO_SHOOT_POS: //Works
+            case DRIVE_GETTING_INTO_SHOOT_POS:
+                Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
                 follower.followPath(shootFirstThree, true);
                 setPathStateOne(PathStateOne.SHOOT_PRELOAD);
                 break;
             case SHOOT_PRELOAD: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4.8){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4.8){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     follower.followPath(getIntoRowOnePos, true);
                     setPathStateOne(PathStateOne.DRIVE_1ST_ROW_POS);
                 } break;
             case DRIVE_1ST_ROW_POS: //Works
                 if (!follower.isBusy()){
-                    turnOffSystems();
                     intakeBalls(pathTimer);
-                    follower.followPath(getFirstRow, true);
-                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
+                    follower.followPath(getFirstRow, .4, true);
+                    setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
                 } break;
+            case SET_UP_LEVER_HIT:
+                if (!follower.isBusy()){
+                    follower.followPath(readyToHitLever,.85, true);
+                    setPathStateOne(PathStateOne.HIT_LEVER);
+                } break;
+            case HIT_LEVER:
+                if (!follower.isBusy()){
+                    follower.followPath(hitLever,.85,true);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
+                }break;
             case DRIVE_RESET_MID_ONE: // Works
                 if (!follower.isBusy()) {
-                    turnOffSystems();
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
                     follower.followPath(resetBackOne, true);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
                     setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
                 } break;
             case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 5){
-                    shootFromMedium();
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
+                    shootFromMediumEX();
+                } else {
+                    turnOffSystems();
                 }
                 break;
             default:
@@ -168,24 +187,26 @@ public class RedAutoTest extends OpMode{
             case INTAKE_2ND_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getRowTwo, true);
+                    follower.followPath(getRowTwo, .5 , true);
                     setPathStateTwo(PathStateTwo.DRIVE_BACK_ROW_TWO);
                 } break;
             case DRIVE_BACK_ROW_TWO:
                 if (!follower.isBusy()){
                     follower.followPath(backUpRowTwo, true);
                     setPathStateTwo(PathStateTwo.DRIVE_RESET_MID_TWO);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                 }break;
             case DRIVE_RESET_MID_TWO:
                 if (!follower.isBusy()) {
-                    turnOffSystems();
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                     follower.followPath(resetBackTwo, true);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                     setPathStateTwo(PathStateTwo.SHOOT_SECOND_ROW);
                 } break;
             case SHOOT_SECOND_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 5){
-                    shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
+                    shootFromMediumEX();
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5){
                     turnOffSystems();
                     pathStateUpdateThree();
                 } break;
@@ -201,26 +222,26 @@ public class RedAutoTest extends OpMode{
             case DRIVE_3RD_ROW_POS:
                 if (!follower.isBusy()){
                     turnOffSystems();
-                    follower.followPath(getIntoRowThree );
+                    follower.followPath(getIntoRowThree);
                     setPathStateThree(PathStateThree.INTAKE_THIRD_ROW);
                 } break;
             case INTAKE_THIRD_ROW:
                 if (!follower.isBusy()){
-                    turnOffSystems();
                     intakeBalls(pathTimer);
-                    follower.followPath(getRowThree);
+                    follower.followPath(getRowThree, .6, true);
                     setPathStateThree(PathStateThree.DRIVE_RESET_MID_THREE);
                 } break;
             case DRIVE_RESET_MID_THREE:
                 if (!follower.isBusy()){
-                    turnOffSystems();
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
                     follower.followPath(resetBackThree);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
                     setPathStateThree(PathStateThree.SHOOT_THIRD_ROW);
                 } break;
             case SHOOT_THIRD_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 5){
-                    shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4.5){
+                    shootFromMediumEX();
+                } else if (!follower.isBusy()){
                     turnOffSystems();
                     follower.followPath(park);
                     setPathStateThree(PathStateThree.DRIVE_PARK);
@@ -250,20 +271,28 @@ public class RedAutoTest extends OpMode{
         pathTimer.resetTimer();
     }
     private void shootFromMedium() {
-        //Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
+        double speed = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
+        Shooter.setShooterPower(speed, .5);
 
-        AutoAim.aimEnabled = true;
-        AutoAim.launcherRequested = true;
+        if (Shooter.rightShooter.getVelocity() > speed - 40 && Shooter.rightShooter.getVelocity() < speed + 40){
+            Intake.setBothIntakePower(1);
+        }
+    }
 
-        if (Shooter.leftShooter.getVelocity() > Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 20 && Shooter.leftShooter.getVelocity() < Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 20 && AutoAim.targetLocked){
+    private void shootFromMediumEX() {
+        double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
+        Shooter.setShooterPower(spped, .15);
+
+        if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
         }
     }
     private void turnOffSystems() {
-        //Shooter.setShooterPower(0);
-        AutoAim.launcherRequested = false;
-        AutoAim.aimEnabled = false;
+        Shooter.setShooterPower(0);
         Intake.setBothIntakePower(0);
+    }
+    public void setMaxMotorPower(double motorPower){
+        follower.drivetrain.setMaxPowerScaling(motorPower);
     }
 
     private void setTimeForCompletion(double timeForCompletionHolder){
@@ -288,7 +317,7 @@ public class RedAutoTest extends OpMode{
         Intake.init(this);
         Shooter.init(this);
         MovementSystem.init(this);
-        AutoAim.init(this);
+        AutoAim.aimEnabled = false;
 
         buildPaths();
         follower.setPose(startPose);
@@ -304,7 +333,6 @@ public class RedAutoTest extends OpMode{
         telemetry.addData("Path State: ", pathStateOne.toString());
         telemetry.addData("Path Time: ", pathTimer.getElapsedTimeSeconds());
         telemetry.addData("Total Time: ", opModeTimer.getElapsedTimeSeconds());
-        AutoAim.loop();
     }
 
     public void timerStages(Timer time){
@@ -318,6 +346,8 @@ public class RedAutoTest extends OpMode{
             turnOffSystems();
         }
     }
+
+
 
     /*
 
