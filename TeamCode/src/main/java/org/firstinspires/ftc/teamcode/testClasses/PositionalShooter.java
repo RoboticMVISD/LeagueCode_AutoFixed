@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.testClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.AutoAim;
-import org.firstinspires.ftc.teamcode.AutoAimJ;
 import org.firstinspires.ftc.teamcode.Teleop.Main;
 
 public class PositionalShooter {
@@ -82,10 +79,10 @@ public class PositionalShooter {
         } else if (op.gamepad2.x) {
             leftShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
             rightShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
-        } else if(!Main.posAutoAim.launcherRequested) {
+        } /*else if(!Main.posAutoAim.launcherRequested) {
             rightShooter.setPower(0);
             leftShooter.setPower(0);
-        }
+        }*/
         /*
         else if (op.gamepad2.dpad_right) {
             AutoAimJ.autoDistancingRequested = true;

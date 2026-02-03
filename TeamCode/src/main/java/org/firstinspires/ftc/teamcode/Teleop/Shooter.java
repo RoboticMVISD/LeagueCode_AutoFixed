@@ -8,16 +8,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.AutoAim;
-import org.firstinspires.ftc.teamcode.AutoAimJ;
-import org.firstinspires.ftc.teamcode.Teleop.Main;
-
 public class Shooter {
     //Initializes all variables required to shoot. Motors on turret, blocker servos, and turret CRServo
     static OpMode op;
     public static DcMotorEx leftShooter, rightShooter;
     public static Servo turretRotator;
-    static Servo blocker;
+    public static CRServo turretRotatorCR;
 
     //Velocity Tester increments for shooterTesterConTwo()
     double TESTVELOCITY = 500;
@@ -60,9 +56,7 @@ public class Shooter {
 
         turretRotator = op.hardwareMap.servo.get("turretRotator");
         turretRotator.setDirection(Servo.Direction.REVERSE);
-
-        blocker = op.hardwareMap.servo.get("blocker");
-        blocker.setDirection(Servo.Direction.REVERSE);
+        turretRotatorCR = op.hardwareMap.crservo.get("turretRotatorCR");
     }
 
     public void loop() throws InterruptedException {
@@ -87,27 +81,18 @@ public class Shooter {
             rightShooter.setPower(0);
             leftShooter.setPower(0);
         }
-        /*
-        else if (op.gamepad2.dpad_right) {
-            AutoAimJ.autoDistancingRequested = true;
-        } else if (op.gamepad2.dpad_left) {
-            AutoAimJ.autoDistancingRequested = false;
-        }
-         */
-
-
     }
 
     public void rotateTurret() {
         if (op.gamepad2.right_trigger > 0) {
-            turretRotator.setPosition(1);
+            turretRotator.getController().pwmDisable();
+            turretRotatorCR.setPower(1);
         } else if (op.gamepad2.left_trigger > 0) {
-            turretRotator.setPosition(-1);
-        } else if (op.gamepad2.left_bumper){
-            turretRotator.setPosition(-.5);
-        }else if (op.gamepad2.right_bumper){
-            turretRotator.setPosition(0);
-        }else {
+            turretRotator.getController().pwmDisable();
+            turretRotatorCR.setPower(-1);
+        } else {
+            turretRotatorCR.setPower(0);
+            turretRotator.getController().pwmEnable();
             turretRotator.setPosition(.5);
         }
     }

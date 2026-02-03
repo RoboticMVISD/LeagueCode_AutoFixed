@@ -8,7 +8,6 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.AutoAim;
 import org.firstinspires.ftc.teamcode.Teleop.Intake;
 import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
 import org.firstinspires.ftc.teamcode.Teleop.Shooter;
@@ -316,7 +315,6 @@ public class RedAutoMainClose12 extends OpMode{
         Intake.init(this);
         Shooter.init(this);
         MovementSystem.init(this);
-        AutoAim.aimEnabled = false;
 
         buildPaths();
         follower.setPose(startPose);

@@ -8,7 +8,6 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.AutoAim;
 import org.firstinspires.ftc.teamcode.Teleop.Intake;
 import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
 import org.firstinspires.ftc.teamcode.Teleop.Shooter;
@@ -281,7 +280,7 @@ public class BlueAutoMainClose12 extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .15);
+        Shooter.setShooterPower(spped, .35);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -317,7 +316,6 @@ public class BlueAutoMainClose12 extends OpMode{
         Intake.init(this);
         Shooter.init(this);
         MovementSystem.init(this);
-        AutoAim.aimEnabled = false;
 
         buildPaths();
         follower.setPose(startPose);
