@@ -2,10 +2,6 @@ package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
-import org.firstinspires.ftc.teamcode.AutoAimJ;
-import org.firstinspires.ftc.teamcode.testClasses.PositionalAutoAim;
-import org.firstinspires.ftc.teamcode.testClasses.PositionalShooter;
-
 
 @TeleOp (name = "Teleop 2025")
 public class Main extends OpMode {

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous;
+package org.firstinspires.ftc.teamcode.Autonomous.ballAutos12.Red;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 
 //TIMES:
-@Autonomous (name = "BlueAutoMain12")
-public class BlueAutoMainClose12 extends OpMode{
+@Autonomous (name = "RedAutoMain12")
+public class RedAutoMainClose12 extends OpMode{
 
     /*
     How this auto will work code wise is that it will have three separate methods which hold case statements.
@@ -39,13 +39,13 @@ public class BlueAutoMainClose12 extends OpMode{
 
     }
     private PathStateOne pathStateOne;
-    private final Pose startPose = new Pose(32.074, 111.92626728110596, Math.toRadians(180));
-    private final Pose shootPose = new Pose(55, 98, Math.toRadians(130));
-    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(125));
-    private final Pose preHitLever = new Pose(45.5, 70.57972350230413, Math.toRadians(90));
-    private final Pose hitLeverPose = new Pose(29.5, 70.57972350230413, Math.toRadians(90));
-    private final Pose rowOneStart = new Pose(56, 82.57972350230413, Math.toRadians(180));
-    private final Pose rowOneEnd = new Pose(34.5, 82.57972350230413  , Math.toRadians(180));
+    private final Pose startPose = new Pose(128.073732718894, 111.92626728110596, Math.toRadians(0));
+    private final Pose shootPose = new Pose(102.230, 98.032, Math.toRadians(36));
+    private final Pose shootPoseEX = new Pose(102.230, 98.032, Math.toRadians(45));
+    private final Pose preHitLever = new Pose(120, 70.57972350230413, Math.toRadians(90));
+    private final Pose hitLeverPose = new Pose(129.5, 70.57972350230413, Math.toRadians(90));
+    private final Pose rowOneStart = new Pose(102.820, 80.57972350230413, Math.toRadians(0));
+    private final Pose rowOneEnd = new Pose(126.50241820768138, 80.57972350230413  , Math.toRadians(0));
     private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
 
 
@@ -59,8 +59,8 @@ public class BlueAutoMainClose12 extends OpMode{
         SHOOT_SECOND_ROW
     }
     private PathStateTwo pathStateTwo;
-    private final Pose rowTwoStart = new Pose(56, 58.866359447004605, Math.toRadians(180));
-    private final Pose rowTwoEnd = new Pose(26.954, 58.39631336405527, Math.toRadians(180));
+    private final Pose rowTwoStart = new Pose(99.76036866359446, 56.866359447004605, Math.toRadians(0));
+    private final Pose rowTwoEnd = new Pose(134.04608294930875, 56.39631336405527, Math.toRadians(0));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -75,10 +75,10 @@ public class BlueAutoMainClose12 extends OpMode{
         DRIVE_PARK
     }
     private PathStateThree pathStateThree;
-    private final Pose rowThreeStart = new Pose(56, 35.5529953917, Math.toRadians(180));
-    private final Pose rowThreeEnd = new Pose(26.954, 35.5529953917, Math.toRadians(180));
-    private final Pose backUpSpot = new Pose(17.952, 33.5529953917, Math.toRadians(180));
-    private final Pose parkPose = new Pose(44.5, 63.82047685834502, Math.toRadians(270));
+    private final Pose rowThreeStart = new Pose(99.76036866359446, 33.5529953917, Math.toRadians(0));
+    private final Pose rowThreeEnd = new Pose(133.04608294930875, 33.5529953917, Math.toRadians(0));
+    private final Pose backUpSpot = new Pose(126.04878048780488, 33.5529953917, Math.toRadians(0));
+    private final Pose parkPose = new Pose(94.72089761570828, 63.82047685834502, Math.toRadians(270));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
 
     private Timer pathTimer, opModeTimer;
@@ -94,11 +94,11 @@ public class BlueAutoMainClose12 extends OpMode{
     }
 
     private PathChain newPathLine(Pose start, Pose end, Boolean isTangential){
-        PathChain path = follower.pathBuilder()
-                .addPath(new BezierLine(start, end))
-                .setTangentHeadingInterpolation()
-                .build();
-        return path;
+            PathChain path = follower.pathBuilder()
+                    .addPath(new BezierLine(start, end))
+                    .setTangentHeadingInterpolation()
+                    .build();
+            return path;
     }
     private void buildPaths(){
         //For Preload and Row One
@@ -124,55 +124,55 @@ public class BlueAutoMainClose12 extends OpMode{
 
     //Method/Switch statement for shooting preload and getting row one & shooting. WORKS
     private void pathStateUpdateOne(){
-        switch (pathStateOne) {
-            case DRIVE_GETTING_INTO_SHOOT_POS:
-                Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
-                follower.followPath(shootFirstThree, true);
-                setPathStateOne(PathStateOne.SHOOT_PRELOAD);
-                break;
-            case SHOOT_PRELOAD: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
-                    shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
-                    turnOffSystems();
-                    follower.followPath(getIntoRowOnePos, true);
-                    setPathStateOne(PathStateOne.DRIVE_1ST_ROW_POS);
-                } break;
-            case DRIVE_1ST_ROW_POS: //Works
-                if (!follower.isBusy()){
-                    intakeBalls(pathTimer);
-                    follower.followPath(getFirstRow, .4, true);
-                    setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
-                } break;
-            case SET_UP_LEVER_HIT:
-                if (!follower.isBusy()){
-                    follower.followPath(readyToHitLever,.85, true);
-                    setPathStateOne(PathStateOne.HIT_LEVER);
-                } break;
-            case HIT_LEVER:
-                if (!follower.isBusy()){
-                    follower.followPath(hitLever,.85,true);
-                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
-                }break;
-            case DRIVE_RESET_MID_ONE: // Works
-                if (!follower.isBusy()) {
+                    switch (pathStateOne) {
+                case DRIVE_GETTING_INTO_SHOOT_POS:
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
-                    follower.followPath(resetBackOne, true);
-                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
-                    setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
-                } break;
-            case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
-                    shootFromMediumEX();
-                } else {
+                    follower.followPath(shootFirstThree, true);
+                    setPathStateOne(PathStateOne.SHOOT_PRELOAD);
+                    break;
+                case SHOOT_PRELOAD: //Works
+                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
+                        shootFromMedium();
+                    } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
+                        turnOffSystems();
+                        follower.followPath(getIntoRowOnePos, true);
+                        setPathStateOne(PathStateOne.DRIVE_1ST_ROW_POS);
+                    } break;
+                case DRIVE_1ST_ROW_POS: //Works
+                    if (!follower.isBusy()){
+                        intakeBalls(pathTimer);
+                        follower.followPath(getFirstRow, .4, true);
+                        setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
+                    } break;
+                case SET_UP_LEVER_HIT:
+                    if (!follower.isBusy()){
+                        follower.followPath(readyToHitLever,.85, true);
+                        setPathStateOne(PathStateOne.HIT_LEVER);
+                    } break;
+                case HIT_LEVER:
+                    if (!follower.isBusy()){
+                        follower.followPath(hitLever,.85,true);
+                        setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
+                    }break;
+                case DRIVE_RESET_MID_ONE: // Works
+                    if (!follower.isBusy()) {
+                        Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
+                        follower.followPath(resetBackOne, true);
+                        Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
+                        setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
+                    } break;
+                case SHOOT_FIRST_ROW: //Works
+                    if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
+                        shootFromMediumEX();
+                    } else {
+                        turnOffSystems();
+                    }
+                    break;
+                default:
                     turnOffSystems();
-                }
-                break;
-            default:
-                turnOffSystems();
-                break;
-        }
-    } // WORKS
+                    break;
+            }
+        } // WORKS
 
     //Method/Case statement meant for the 2nd row of balls and shooting them
     private void pathStateUpdateTwo(){
@@ -193,7 +193,6 @@ public class BlueAutoMainClose12 extends OpMode{
                 if (!follower.isBusy()){
                     follower.followPath(backUpRowTwo, true);
                     setPathStateTwo(PathStateTwo.DRIVE_RESET_MID_TWO);
-                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                 }break;
             case DRIVE_RESET_MID_TWO:
                 if (!follower.isBusy()) {
@@ -211,7 +210,7 @@ public class BlueAutoMainClose12 extends OpMode{
                 } break;
             default:
                 turnOffSystems();
-                break;
+               break;
         }
     } // WORKS
 
@@ -270,17 +269,17 @@ public class BlueAutoMainClose12 extends OpMode{
         pathTimer.resetTimer();
     }
     private void shootFromMedium() {
-        double speed = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(speed, .5);
+        double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
+        Shooter.setShooterPower(spped, .25);
 
-        if (Shooter.rightShooter.getVelocity() > speed - 40 && Shooter.rightShooter.getVelocity() < speed + 40){
+        if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
         }
     }
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .35);
+        Shooter.setShooterPower(spped, .15);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
