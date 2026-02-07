@@ -1,17 +1,11 @@
-package org.firstinspires.ftc.teamcode.Teleop.PrismLED;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.firstinspires.ftc.teamcode.Teleop.PrismLED.GoBildaPrismDriver.Artboard;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Teleop.PrismLED.GoBildaPrismDriver;
-
-
-import java.util.concurrent.TimeUnit;
+import static org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.GoBildaPrismDriver.Artboard;
 
 /*
  * This example shows how to recall previously created Artboards on the goBILDA Prism RGB Driver.

@@ -8,10 +8,10 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Teleop.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
-import org.firstinspires.ftc.teamcode.Teleop.Shooter;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystem;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
@@ -313,7 +313,7 @@ public class RedAutoMainClose12 extends OpMode{
         isShooting = false;
         follower = Constants.createFollower(hardwareMap);
         Intake.init(this);
-        Shooter.init(this);
+        Shooter.init(this, false);
         MovementSystem.init(this);
 
         buildPaths();

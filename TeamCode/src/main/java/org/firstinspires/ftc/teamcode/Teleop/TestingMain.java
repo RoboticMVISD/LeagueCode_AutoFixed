@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystem;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 
-@TeleOp (name = "Teleop 2025")
-public class Main extends OpMode {
+@TeleOp (name = "Teleop Testing")
+public class TestingMain extends OpMode {
 
     MovementSystem movementSystem = new MovementSystem();
     Intake intake = new Intake();
@@ -19,7 +19,7 @@ public class Main extends OpMode {
     {
         intake.init(this);
         movementSystem.init(this);
-        shooter.init(this, false);
+        Shooter.init(this, true);
     }
 
     @Override

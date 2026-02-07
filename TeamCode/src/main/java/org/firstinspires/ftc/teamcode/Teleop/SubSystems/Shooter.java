@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -35,11 +35,13 @@ public class Shooter {
     public static double derivative = 0.001;
     public static double feedForward = 10;
     public static PIDFCoefficients pidfCoefficients = new PIDFCoefficients(proportional, integral, derivative, feedForward);
+    public static boolean isTesting;
 
-    public static boolean autoAimEnabled;
 
-    public static void init(OpMode OP) {
+
+    public static void init(OpMode OP, boolean testing) {
         op = OP;
+        isTesting = testing;
 
         leftShooter = op.hardwareMap.get(DcMotorEx.class, "leftShooter");
         leftShooter.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -60,8 +62,13 @@ public class Shooter {
     }
 
     public void loop() throws InterruptedException {
-        shooterConTwo();
-        rotateTurret();
+        if (isTesting){
+            shooterConOne();
+        } else {
+            shooterConTwo();
+            rotateTurret();
+        }
+
     }
 
     public void shooterConTwo() {
@@ -81,6 +88,22 @@ public class Shooter {
             rightShooter.setPower(0);
             leftShooter.setPower(0);
         }
+    }
+
+    public void shooterConOne() {
+        turretRotatorCR.setPower(op.gamepad1.left_bumper ? -1 : 0);
+        turretRotatorCR.setPower(op.gamepad1.right_bumper ? 1  : 0);
+
+        leftShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+
+        //Add AutoAim and AutoDistancing. Left Stick Down for Aim, Right stick Down for Distancing
     }
 
     public void rotateTurret() {

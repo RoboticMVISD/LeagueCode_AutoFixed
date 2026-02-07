@@ -20,7 +20,7 @@
  *   SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Teleop.PrismLED;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
 public enum Direction {
     Forward,

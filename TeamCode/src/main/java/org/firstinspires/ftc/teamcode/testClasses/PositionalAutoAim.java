@@ -2,10 +2,9 @@
 package org.firstinspires.ftc.teamcode.testClasses;
 
 import android.util.Size;
-import java.lang.Math;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.Teleop.Shooter;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;

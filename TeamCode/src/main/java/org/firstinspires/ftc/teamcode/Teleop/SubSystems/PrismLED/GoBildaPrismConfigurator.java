@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teleop.PrismLED;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
 /*   MIT License
  *   Copyright (c) [2025] [Base 10 Assets, LLC]
@@ -22,14 +22,14 @@ package org.firstinspires.ftc.teamcode.Teleop.PrismLED;
  *   SOFTWARE.
  */
 
-import static org.firstinspires.ftc.teamcode.Teleop.PrismLED.GoBildaPrismDriver.LayerHeight;
+import static org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.GoBildaPrismDriver.LayerHeight;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Teleop.PrismLED.PrismAnimations.AnimationType;
-import org.firstinspires.ftc.teamcode.Teleop.PrismLED.PrismAnimations.PoliceLights;
-import org.firstinspires.ftc.teamcode.Teleop.PrismLED.GoBildaPrismDriver.Artboard;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.PrismAnimations.AnimationType;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.PrismAnimations.PoliceLights;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.GoBildaPrismDriver.Artboard;
 
 import java.util.concurrent.TimeUnit;
 
