@@ -65,7 +65,7 @@ public class ColorLEDSystem extends LinearOpMode {
 
     GoBildaPrismDriver prism;
 
-    PrismAnimations.Solid solid = new PrismAnimations.Solid(Color.BLUE);
+    PrismAnimations.Solid solid = new PrismAnimations.Solid(Color.CYAN);
     PrismAnimations.RainbowSnakes rainbowSnakes = new PrismAnimations.RainbowSnakes();
 
     @Override
@@ -82,20 +82,14 @@ public class ColorLEDSystem extends LinearOpMode {
          * has carefully selected default parameters. So you do not need to set each parameter
          * for every animation!
          */
-        solid.setBrightness(50);
+        solid.setBrightness(75);
         solid.setStartIndex(0);
         solid.setStopIndex(12);
 
         rainbowSnakes.setNumberOfSnakes(2);
         rainbowSnakes.setSnakeLength(3);
-        rainbowSnakes.setSpacingBetween(6);
+        rainbowSnakes.setSpacingBetween(2);
         rainbowSnakes.setSpeed(0.5f);
-
-        telemetry.addData("Device ID: ", prism.getDeviceID());
-        telemetry.addData("Firmware Version: ", prism.getFirmwareVersionString());
-        telemetry.addData("Hardware Version: ", prism.getHardwareVersionString());
-        telemetry.addData("Power Cycle Count: ", prism.getPowerCycleCount());
-        telemetry.update();
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -136,8 +130,6 @@ public class ColorLEDSystem extends LinearOpMode {
             telemetry.addLine("Press X to clear current animations.");
             telemetry.addLine("Press D-Pad Down to save current animations to Artboard #0");
             telemetry.addLine();
-            telemetry.addData("Run Time (Hours): ",prism.getRunTime(TimeUnit.HOURS));
-            telemetry.addData("Run Time (Minutes): ",prism.getRunTime(TimeUnit.MINUTES));
             telemetry.addData("Number of LEDS: ", prism.getNumberOfLEDs());
             telemetry.addData("Current FPS: ", prism.getCurrentFPS());
             telemetry.update();
