@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Movement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
@@ -318,8 +319,8 @@ public class BlueAutoMainClose12 extends OpMode{
         follower = Constants.createFollower(hardwareMap);
 
         Intake.init(this);
-        Shooter.init(this);
-        OldMovement.init(this);
+        Shooter.init(this, false);
+        Movement.init(this.hardwareMap);
         turretRotator = this.hardwareMap.servo.get("turretRotator");
 
         buildPaths();

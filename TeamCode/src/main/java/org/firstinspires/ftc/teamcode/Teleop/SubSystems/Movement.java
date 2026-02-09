@@ -22,15 +22,15 @@ public class Movement {
 
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontLeftDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backRightDrive = null;
+    private static DcMotor frontLeftDrive = null;
+    private static DcMotor backLeftDrive = null;
+    private static DcMotor frontRightDrive = null;
+    private static DcMotor backRightDrive = null;
 
     // TODO: likely change this back to 1
     private final double SPIN_DAMPING = 1.4;   // higher means slower turning
 
-    public void init(HardwareMap hwMap) {
+    public static void init(HardwareMap hwMap) {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the Driver Hub.
