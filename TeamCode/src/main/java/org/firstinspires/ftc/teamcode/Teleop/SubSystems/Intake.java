@@ -7,8 +7,7 @@ public class Intake {
     static OpMode op;
     public static DcMotor intake, secondaryIntake;
 
-    final double INTAKE_MOTOR_SPEED = 1;
-    double SECONDARY_INTAKE_SPEED = 1;
+    final double INTAKE_MOTOR_SPEED = .8;
 
 
     public static void init(OpMode OP){
@@ -24,13 +23,18 @@ public class Intake {
     }
 
     public void moveIntakeConOne(){
-        intake.setPower(op.gamepad1.right_trigger > 0 ? INTAKE_MOTOR_SPEED : 0);
-
-        intake.setPower(op.gamepad1.left_trigger > 0 ? INTAKE_MOTOR_SPEED : 0);
-        secondaryIntake.setPower(op.gamepad1.left_trigger > 0 ? INTAKE_MOTOR_SPEED : 0);
-
-        intake.setPower(op.gamepad1.dpad_down ? -INTAKE_MOTOR_SPEED : 0);
-        secondaryIntake.setPower(op.gamepad1.dpad_down ? -INTAKE_MOTOR_SPEED : 0);
+        if (op.gamepad1.right_trigger > 0){
+            intake.setPower(INTAKE_MOTOR_SPEED);
+        } else if (op.gamepad1.left_trigger > 0){
+            intake.setPower(INTAKE_MOTOR_SPEED);
+            secondaryIntake.setPower(INTAKE_MOTOR_SPEED);
+        } else if (op.gamepad1.dpad_down){
+            intake.setPower(-INTAKE_MOTOR_SPEED);
+            secondaryIntake.setPower(-INTAKE_MOTOR_SPEED);
+        } else {
+            intake.setPower(0);
+            secondaryIntake.setPower(0);
+        }
     }
 
     public static void setBothIntakePower(double pwr){

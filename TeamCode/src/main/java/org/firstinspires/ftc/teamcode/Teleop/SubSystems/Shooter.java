@@ -62,7 +62,9 @@ public class Shooter {
 
     public void loop() throws InterruptedException {
         if (testMode){
-            shooterConOne();
+            if (!Main.autoAim.launcherRequested) {
+                shooterConOne();
+            }
         } else {
         if (!Main.autoAim.launcherRequested) {
             shooterConTwo();
@@ -70,30 +72,36 @@ public class Shooter {
             rotateTurret();}
     }
     public void shooterConOne() {
-        turretRotatorCR.setPower(op.gamepad1.left_bumper ? -1 : 0);
-        turretRotatorCR.setPower(op.gamepad1.right_bumper ? 1  : 0);
-
-        leftShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
-
-        leftShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
-
-        leftShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+        if (op.gamepad1.a){
+            setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
+        } else if (op.gamepad1.b){
+            setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
+        } else if (op.gamepad1.y){
+            setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
+        } else if (op.gamepad1.left_bumper){
+            turretRotatorCR.setPower(-1);
+        }else if (op.gamepad1.right_bumper){
+            turretRotatorCR.setPower(1);
+        }else {
+            setShooterPower(0);
+            turretRotatorCR.setPower(0);
+        }
 
         //Add AutoAim and AutoDistancing. Left Stick Down for Aim, Right stick Down for Distancing
     }
 
     public void shooterConTwo() {
-        leftShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
-
-        leftShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
-
-        leftShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
-        rightShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+        if (op.gamepad2.a){
+           setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
+        } else if (op.gamepad2.b){
+            setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
+        } else if (op.gamepad2.y){
+            setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
+        } else if (op.gamepad2.x){
+            setShooterPower(BALL_REVERSE_SPEED);
+        }else {
+            setShooterPower(0);
+        }
 
     }
 
