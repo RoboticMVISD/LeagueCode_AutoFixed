@@ -3,14 +3,14 @@ package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Movement;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PedroMovement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 
 @TeleOp (name = "Teleop Testing")
 public class TestingMain extends OpMode {
 
-    Movement movement = new Movement();
+    PedroMovement pedroMovement = new PedroMovement();
     Intake intake = new Intake();
     Shooter shooter = new Shooter();
 
@@ -18,14 +18,19 @@ public class TestingMain extends OpMode {
     public void init()
     {
         intake.init(this);
-        movement.init(this.hardwareMap);
+        pedroMovement.init(this);
         shooter.init(this, true);
+    }
+
+    @Override
+    public void start(){
+        pedroMovement.start();
     }
 
     @Override
     public void loop(){
         intake.loop();
-        movement.drive(-gamepad1.left_stick_y * .85, gamepad1.left_stick_x * .85, gamepad1.right_stick_x * .85);
+        pedroMovement.loop();
 
         try {
             shooter.loop();

@@ -17,24 +17,22 @@ import java.util.function.Supplier;
 
 public class PedroMovement {
     private Follower follower;
-    public static Pose startingPose;
+    public static Pose startingPose = new Pose(8.663594470046084, 8.442396313364064, Math.toRadians(90)); //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
-    private boolean slowMode = false;
-    private double slowModeMultiplier = 0.5;
-
-    OpMode op;
+    private double slowModeMultiplier = 0.85;
+    private double turnSpeedDamper = 0.5;
     Gamepad gamepad1;
-
+    Gamepad gamepad2;
 
     public void init(OpMode OP) {
-        Movement.init(op.hardwareMap);
-        follower = Constants.createFollower(op.hardwareMap);
-        follower.drivetrain.setMaxPowerScaling(.5);
+        follower = Constants.createFollower(OP.hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
-        startingPose.setHeading(0);
         follower.update();
+
+        gamepad1 = OP.gamepad1;
+        gamepad2 = OP.gamepad2;
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -42,10 +40,6 @@ public class PedroMovement {
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
                 .build();
-
-        op = OP;
-
-        gamepad1 = op.gamepad1;
     }
 
     public void start() {
@@ -56,33 +50,34 @@ public class PedroMovement {
     }
 
     public void loop() {
-        //Call this once per loop
         follower.update();
         telemetryM.update();
 
-        drivePedro();
-    }
-
-    public void drivePedro(){
         if (!automatedDrive) {
-            if (!slowMode) follower.setTeleOpDrive(
-                    -gamepad1.left_stick_y ,
-                    -gamepad1.left_stick_x ,
-                    -gamepad1.right_stick_x ,
+                    follower.setTeleOpDrive(
+                    gamepad1.left_stick_y * slowModeMultiplier,
+                    -gamepad1.left_stick_x * slowModeMultiplier,
+                    -gamepad1.right_stick_x * turnSpeedDamper,
                     false // Robot Centric
             );
-
-            //Automated PathFollowing
-            if (gamepad1.aWasPressed()) {
-                follower.followPath(pathChain.get());
-                automatedDrive = true;
-            }
-
-            //Stop automated following if the follower is done
-            if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
-                follower.startTeleopDrive();
-                automatedDrive = false;
-            }
         }
+
+        /*//Automated PathFollowing
+        if (gamepad1.aWasPressed()) {
+            follower.followPath(pathChain.get());
+            automatedDrive = true;
+        }
+            */
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
+        }
+
+
+        telemetryM.debug("position", follower.getPose());
+        telemetryM.debug("velocity", follower.getVelocity());
+        telemetryM.debug("automatedDrive", automatedDrive);
     }
 }
+

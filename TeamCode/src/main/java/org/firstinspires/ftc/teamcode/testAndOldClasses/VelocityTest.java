@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.testClasses;
+package org.firstinspires.ftc.teamcode.testAndOldClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;

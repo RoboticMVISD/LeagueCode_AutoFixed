@@ -62,13 +62,10 @@ public class Shooter {
 
     public void loop() throws InterruptedException {
         if (testMode){
-            if (!Main.autoAim.launcherRequested) {
                 shooterConOne();
-            }
+
         } else {
-        if (!Main.autoAim.launcherRequested) {
             shooterConTwo();
-        }
             rotateTurret();}
     }
     public void shooterConOne() {
@@ -86,8 +83,6 @@ public class Shooter {
             setShooterPower(0);
             turretRotatorCR.setPower(0);
         }
-
-        //Add AutoAim and AutoDistancing. Left Stick Down for Aim, Right stick Down for Distancing
     }
 
     public void shooterConTwo() {

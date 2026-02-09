@@ -1,10 +1,10 @@
-
-package org.firstinspires.ftc.teamcode.testClasses;
+package org.firstinspires.ftc.teamcode.testAndOldClasses;
 
 import android.util.Size;
-
+import java.lang.Math;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 import java.util.List;
-public class PositionalAutoAim {
+public class AutoAim {
 
     private static final boolean USE_WEBCAM = true;
 
@@ -32,17 +32,19 @@ public class PositionalAutoAim {
     private static double currentGoalElevation;
     private static double currentGoalRange;
     private static double targetLaunchVelocity;
-    private static boolean noTagDetected;
+    static boolean noTagDetected;
     public static boolean targetLocked = false;
     public static boolean aimEnabled = false;
     public static boolean launcherRequested = false;
     public static boolean refindGoalAttempted = true;
 
-    static final private double turnMultiplier = 2;
+    static final private double turnMultiplier = 3.25;
     static final private double launchMultiplier = 7.15;
     static final private double launchOffset = 756.68282;
-    static final private double closeBoundary = 2;
+    static final private double aimBoundary = 1;
+    static final private double lockBoundary = 2;
     static final private double turnPower = 1;
+    static final private int turnOffset = -7;
 
 
     /**
@@ -65,10 +67,17 @@ public class PositionalAutoAim {
 
     public static void loop() {
 
-        telemetryAprilTag();
-        aimTurret();
-        autoDistance();
-        conTwoAutoAimAndDistanceControls();
+        if (Shooter.testMode){
+            telemetryAprilTag();
+            aimTurret();
+            autoDistance();
+            conOneAutoAimAndDistanceControls();
+        } else {
+            telemetryAprilTag();
+            aimTurret();
+            autoDistance();
+            conTwoAutoAimAndDistanceControls();
+        }
 
         op.telemetry.addData("Current Goal", currentGoalTag);
         op.telemetry.addData("Current Obelisk", currentObeliskTag);
@@ -89,6 +98,7 @@ public class PositionalAutoAim {
                 throw new RuntimeException(e);
             }
         } else {
+            Shooter.turretRotatorCR.setPower(0);
             indicatorLight.setPosition(0.388);
         }
     }
@@ -97,8 +107,8 @@ public class PositionalAutoAim {
         if (launcherRequested) {
             setLauncherPower();
         } else {
-            PositionalShooter.leftShooter.setVelocity(0);
-            PositionalShooter.rightShooter.setVelocity(0);
+            Shooter.leftShooter.setVelocity(0);
+            Shooter.rightShooter.setVelocity(0);
         }
     }
 
@@ -212,35 +222,64 @@ public class PositionalAutoAim {
      * using the turret rotator, position the turret to the proper horizontal angle for the goal.
      */
     public static void positionTurret() throws InterruptedException {
-        double currentTurretPosition = PositionalShooter.turretRotator.getPosition();
 
-        currentTurretPosition = currentTurretPosition + (currentGoalElevation / 500);
+        rotateDuration = (Math.abs(currentGoalElevation) / turnPower) * turnMultiplier;
 
-        PositionalShooter.turretRotator.setPosition(currentTurretPosition);
 
-        targetLocked = currentGoalElevation < closeBoundary && currentGoalElevation > -closeBoundary && !noTagDetected;
+        if((currentGoalElevation > aimBoundary + turnOffset || currentGoalElevation < -aimBoundary + turnOffset) && !noTagDetected){
+            if (currentGoalElevation > turnOffset) {
+                Shooter.turretRotatorCR.setPower(-turnPower);
+            } else {
+                Shooter.turretRotatorCR.setPower(turnPower);
+            }
+            Thread.sleep((long) rotateDuration + 1);
+            Shooter.turretRotatorCR.setPower(0);
 
-        if (targetLocked) {
+            refindGoalAttempted = false;
+        } else if (noTagDetected && !refindGoalAttempted){
+            if (currentGoalElevation > 0) {
+                //bearingServo.setPower(turnPower);
+            } else {
+                //. bearingServo.setPower(-turnPower);
+            }
+            //Thread.sleep(250);
+
+            Shooter.turretRotatorCR.setPower(0);
+
+            refindGoalAttempted = true;
+        } else {
+            Shooter.turretRotatorCR.setPower(0);
+        }
+
+        targetLocked = (currentGoalElevation < (lockBoundary + turnOffset)) && (currentGoalElevation > (-lockBoundary + turnOffset)) && !noTagDetected;
+
+        if (!targetLocked) {
+            indicatorLight.setPosition(0.290);
+        } else if(!(Shooter.leftShooter.getVelocity() > targetLaunchVelocity - 20 && Shooter.leftShooter.getVelocity() < targetLaunchVelocity - 20)) {
             indicatorLight.setPosition(0.500);
         } else {
-            indicatorLight.setPosition(0.290);
+            indicatorLight.setPosition(0.800);
         }
     }
 
     private static void setLauncherPower() {
-        PositionalShooter.leftShooter.setVelocity(targetLaunchVelocity);
-        PositionalShooter.rightShooter.setVelocity(targetLaunchVelocity);
+        Shooter.leftShooter.setVelocity(targetLaunchVelocity);
+        Shooter.rightShooter.setVelocity(targetLaunchVelocity);
     }
 
     public static void conTwoAutoAimAndDistanceControls(){
-        if (op.gamepad2.dpad_left){
-            launcherRequested = false;
-        } else if (op.gamepad2.dpad_right){
-            launcherRequested = true;
-        } else if (op.gamepad2.dpad_up){
-            aimEnabled = true;
-        } else if (op.gamepad2.dpad_down){
-            aimEnabled = false;
+        if (op.gamepad2.dpadDownWasPressed()){
+            launcherRequested = !launcherRequested;
+        } else if (op.gamepad2.dpadUpWasPressed()) {
+            aimEnabled = !aimEnabled;
+        }
+    }
+
+    public static void conOneAutoAimAndDistanceControls(){
+        if (op.gamepad1.leftStickButtonWasPressed()){
+            launcherRequested = !launcherRequested;
+        } else if (op.gamepad1.rightStickButtonWasPressed()) {
+            aimEnabled = !aimEnabled;
         }
     }
 }
