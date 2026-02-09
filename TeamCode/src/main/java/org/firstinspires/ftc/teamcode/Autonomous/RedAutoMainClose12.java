@@ -7,11 +7,11 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Teleop.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
-import org.firstinspires.ftc.teamcode.Teleop.Shooter;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
@@ -25,6 +25,8 @@ public class RedAutoMainClose12 extends OpMode{
     private Follower follower;
     private Boolean isShooting;
     private Boolean stageOneBusy;
+    public static Servo turretRotator;
+
 
 
     //Enum For Shooting/Getting Preload and First Row of Balls. As well as all the variables used for it
@@ -39,12 +41,12 @@ public class RedAutoMainClose12 extends OpMode{
 
     }
     private PathStateOne pathStateOne;
-    private final Pose startPose = new Pose(128.073732718894, 111.92626728110596, Math.toRadians(0));
+    private final Pose startPose = new Pose(127.073732718894, 109.92626728110596, Math.toRadians(0));
     private final Pose shootPose = new Pose(102.230, 98.032, Math.toRadians(36));
     private final Pose shootPoseEX = new Pose(102.230, 98.032, Math.toRadians(45));
     private final Pose preHitLever = new Pose(120, 70.57972350230413, Math.toRadians(90));
-    private final Pose hitLeverPose = new Pose(129.5, 70.57972350230413, Math.toRadians(90));
-    private final Pose rowOneStart = new Pose(102.820, 80.57972350230413, Math.toRadians(0));
+    private final Pose hitLeverPose = new Pose(128, 70.57972350230413, Math.toRadians(90));
+    private final Pose rowOneStart = new Pose(99.820, 80.57972350230413, Math.toRadians(0));
     private final Pose rowOneEnd = new Pose(126.50241820768138, 80.57972350230413  , Math.toRadians(0));
     private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
 
@@ -202,9 +204,9 @@ public class RedAutoMainClose12 extends OpMode{
                     setPathStateTwo(PathStateTwo.SHOOT_SECOND_ROW);
                 } break;
             case SHOOT_SECOND_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
                     shootFromMediumEX();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4.5){
                     turnOffSystems();
                     pathStateUpdateThree();
                 } break;
@@ -226,7 +228,7 @@ public class RedAutoMainClose12 extends OpMode{
             case INTAKE_THIRD_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getRowThree, .6, true);
+                    follower.followPath(getRowThree, .5, true);
                     setPathStateThree(PathStateThree.DRIVE_RESET_MID_THREE);
                 } break;
             case DRIVE_RESET_MID_THREE:
@@ -270,7 +272,7 @@ public class RedAutoMainClose12 extends OpMode{
     }
     private void shootFromMedium() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .25);
+        Shooter.setShooterPower(spped, .5, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -279,7 +281,7 @@ public class RedAutoMainClose12 extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .15);
+        Shooter.setShooterPower(spped, .45, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -308,16 +310,23 @@ public class RedAutoMainClose12 extends OpMode{
         pathStateOne = PathStateOne.DRIVE_GETTING_INTO_SHOOT_POS;
         pathStateTwo = PathStateTwo.DRIVE_2ND_ROW_POS;
         pathStateThree = PathStateThree.DRIVE_3RD_ROW_POS;
+
         pathTimer = new Timer();
         opModeTimer = new Timer();
+
         isShooting = false;
+
         follower = Constants.createFollower(hardwareMap);
+
         Intake.init(this);
         Shooter.init(this);
-        MovementSystem.init(this);
+        OldMovement.init(this);
+        turretRotator = this.hardwareMap.servo.get("turretRotator");
+        turretRotator.setDirection(Servo.Direction.REVERSE);
 
         buildPaths();
         follower.setPose(startPose);
+
     }
 
     public void start(){

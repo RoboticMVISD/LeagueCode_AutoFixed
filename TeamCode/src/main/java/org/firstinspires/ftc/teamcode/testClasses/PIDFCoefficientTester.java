@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.testClasses;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Teleop.Shooter;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 public class PIDFCoefficientTester{
 

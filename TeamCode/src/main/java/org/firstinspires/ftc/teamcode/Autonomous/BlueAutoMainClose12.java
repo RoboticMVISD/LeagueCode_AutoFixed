@@ -7,11 +7,11 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Teleop.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.MovementSystem;
-import org.firstinspires.ftc.teamcode.Teleop.Shooter;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
@@ -25,7 +25,7 @@ public class BlueAutoMainClose12 extends OpMode{
     private Follower follower;
     private Boolean isShooting;
     private Boolean stageOneBusy;
-
+    private Servo turretRotator;
 
     //Enum For Shooting/Getting Preload and First Row of Balls. As well as all the variables used for it
     private enum PathStateOne {
@@ -271,7 +271,7 @@ public class BlueAutoMainClose12 extends OpMode{
     }
     private void shootFromMedium() {
         double speed = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(speed, .5);
+        Shooter.setShooterPower(speed, .75, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > speed - 40 && Shooter.rightShooter.getVelocity() < speed + 40){
             Intake.setBothIntakePower(1);
@@ -280,7 +280,7 @@ public class BlueAutoMainClose12 extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .35);
+        Shooter.setShooterPower(spped, .85, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -309,13 +309,18 @@ public class BlueAutoMainClose12 extends OpMode{
         pathStateOne = PathStateOne.DRIVE_GETTING_INTO_SHOOT_POS;
         pathStateTwo = PathStateTwo.DRIVE_2ND_ROW_POS;
         pathStateThree = PathStateThree.DRIVE_3RD_ROW_POS;
+
         pathTimer = new Timer();
         opModeTimer = new Timer();
+
         isShooting = false;
+
         follower = Constants.createFollower(hardwareMap);
+
         Intake.init(this);
         Shooter.init(this);
-        MovementSystem.init(this);
+        OldMovement.init(this);
+        turretRotator = this.hardwareMap.servo.get("turretRotator");
 
         buildPaths();
         follower.setPose(startPose);

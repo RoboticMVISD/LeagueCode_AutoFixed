@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teleop;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -8,14 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Teleop.OpModes.Main;
+
 public class Shooter {
-    //Initializes all variables required to shoot. Motors on turret, blocker servos, and turret CRServo
     static OpMode op;
     public static DcMotorEx leftShooter, rightShooter;
-    public static Servo turretRotator;
     public static CRServo turretRotatorCR;
 
-    //Velocity Tester increments for shooterTesterConTwo()
+
     double TESTVELOCITY = 500;
     int SMALL_INCREMENT = 50;
     int LARGE_INCREMENT = 100;
@@ -36,13 +36,15 @@ public class Shooter {
     public static double feedForward = 10;
     public static PIDFCoefficients pidfCoefficients = new PIDFCoefficients(proportional, integral, derivative, feedForward);
 
-    public static boolean autoAimEnabled;
+    public static boolean testMode;
 
-    public static void init(OpMode OP) {
+    public static void init(OpMode OP, boolean isTesting) {
         op = OP;
 
+        testMode = isTesting;
+
         leftShooter = op.hardwareMap.get(DcMotorEx.class, "leftShooter");
-        leftShooter.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftShooter.setDirection(DcMotorSimple.Direction.REVERSE);
         leftShooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -54,47 +56,50 @@ public class Shooter {
         rightShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightShooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
-        turretRotator = op.hardwareMap.servo.get("turretRotator");
-        turretRotator.setDirection(Servo.Direction.REVERSE);
         turretRotatorCR = op.hardwareMap.crservo.get("turretRotatorCR");
+
     }
 
     public void loop() throws InterruptedException {
-        shooterConTwo();
-        rotateTurret();
+        if (testMode){
+            shooterConOne();
+        } else {
+        if (!Main.autoAim.launcherRequested) {
+            shooterConTwo();
+        }
+            rotateTurret();}
+    }
+    public void shooterConOne() {
+        turretRotatorCR.setPower(op.gamepad1.left_bumper ? -1 : 0);
+        turretRotatorCR.setPower(op.gamepad1.right_bumper ? 1  : 0);
+
+        leftShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+
+        //Add AutoAim and AutoDistancing. Left Stick Down for Aim, Right stick Down for Distancing
     }
 
     public void shooterConTwo() {
-        if (op.gamepad2.y) {
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_LONGRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_LONGRANGE);
-        } else if (op.gamepad2.b) {
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_MEDIUMRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_MEDIUMRANGE);
-        } else if (op.gamepad2.a) {
-            rightShooter.setVelocity(SPIN_UP_VELOCITY_SHORTRANGE);
-            leftShooter.setVelocity(SPIN_UP_VELOCITY_SHORTRANGE);
-        } else if (op.gamepad2.x) {
-            leftShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
-            rightShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
-        } else {
-            rightShooter.setPower(0);
-            leftShooter.setPower(0);
-        }
+        leftShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.a ? SPIN_UP_VELOCITY_SHORTRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.b ? SPIN_UP_VELOCITY_MEDIUMRANGE : 0);
+
+        leftShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+        rightShooter.setVelocity(op.gamepad1.y ? SPIN_UP_VELOCITY_LONGRANGE : 0);
+
     }
 
     public void rotateTurret() {
-        if (op.gamepad2.right_trigger > 0) {
-            turretRotator.getController().pwmDisable();
-            turretRotatorCR.setPower(1);
-        } else if (op.gamepad2.left_trigger > 0) {
-            turretRotator.getController().pwmDisable();
-            turretRotatorCR.setPower(-1);
-        } else {
-            turretRotatorCR.setPower(0);
-            turretRotator.getController().pwmEnable();
-            turretRotator.setPosition(.5);
-        }
+        turretRotatorCR.setPower(op.gamepad2.right_trigger > 0 ? 1 : 0);
+        turretRotatorCR.setPower(op.gamepad2.left_trigger > 0 ? -1 : 0);
     }
 
     public void shooterTesterConTwo() throws InterruptedException {
@@ -121,13 +126,11 @@ public class Shooter {
     }
 
     public static void setShooterPower(double Vel) {
-        leftShooter.setVelocity(Vel);
-        rightShooter.setVelocity(Vel);
+        leftShooter.setVelocity(Vel); rightShooter.setVelocity(Vel);
     }
 
-    public static void setShooterPower(double Vel, double shooterTurretPos){
-        leftShooter.setVelocity(Vel);
-        rightShooter.setVelocity(Vel);
+    public static void setShooterPower(double Vel, double shooterTurretPos, Servo turretRotator){
+        leftShooter.setVelocity(Vel); rightShooter.setVelocity(Vel);
         turretRotator.setPosition(shooterTurretPos);
 
     }

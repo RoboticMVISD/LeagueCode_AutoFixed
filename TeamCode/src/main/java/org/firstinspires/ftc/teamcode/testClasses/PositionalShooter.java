@@ -7,8 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Teleop.Main;
-
 public class PositionalShooter {
     //Initializes all variables required to shoot. Motors on turret, blocker servos, and turret CRServo
     static OpMode op;
@@ -79,17 +77,7 @@ public class PositionalShooter {
         } else if (op.gamepad2.x) {
             leftShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
             rightShooter.setVelocity(-SPIN_UP_VELOCITY_SHORTRANGE * 0.5);
-        } /*else if(!Main.posAutoAim.launcherRequested) {
-            rightShooter.setPower(0);
-            leftShooter.setPower(0);
-        }*/
-        /*
-        else if (op.gamepad2.dpad_right) {
-            AutoAimJ.autoDistancingRequested = true;
-        } else if (op.gamepad2.dpad_left) {
-            AutoAimJ.autoDistancingRequested = false;
         }
-         */
 
 
     }
