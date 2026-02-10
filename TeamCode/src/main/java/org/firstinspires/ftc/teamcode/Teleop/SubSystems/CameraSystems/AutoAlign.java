@@ -84,7 +84,7 @@ public class AutoAlign extends OpMode {
         }
 
         //Drive Our Motors
-        drive.drive(-gamepad1.left_stick_y * .85, gamepad1.left_stick_x * .85, gamepad1.right_stick_x * .85);
+        drive.drive(forward, strafe, rotate);
 
         if (gamepad1.bWasPressed()){
             stepIndex = (stepIndex - 1) % stepSizes.length;

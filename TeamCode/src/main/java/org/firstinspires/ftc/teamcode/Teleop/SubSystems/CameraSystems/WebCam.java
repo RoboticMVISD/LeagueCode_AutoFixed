@@ -40,7 +40,7 @@ public class WebCam {
         VisionPortal.Builder builder = new VisionPortal.Builder();
         builder.setCamera(op.hardwareMap.get(WebcamName.class, "Webcam 1"));
         builder.setCameraResolution(new Size(640,480));
-        builder.enableLiveView(false);
+        builder.enableLiveView(true);
         builder.addProcessor(processor);
 
         portal = builder.build();

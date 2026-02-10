@@ -18,7 +18,7 @@ public class BlueMain extends OpMode {
     public void init()
     {
         intake.init(this);
-        Shooter.init(this, false);
+        shooter.init(this, false);
         pedroMovementBlue.init(this);
     }
 
