@@ -9,33 +9,44 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Shooter {
+    // --------- Making an OpMode object to use for hardware maps, gamepads, etc ------------ //
     static OpMode op;
+    // -------- Objects for the hardware being used by turret & shooters //
     public static DcMotorEx leftShooter, rightShooter;
     public static CRServo turretRotatorCR;
 
 
+    // ----- Variables for the controller two tester to find a optimal velocity for a certain range ------ //
     double TESTVELOCITY = 500;
     int SMALL_INCREMENT = 50;
     int LARGE_INCREMENT = 100;
 
     //Max Velocity range is -2500 to 2500
+    //These are preset velocity values for certain ranges from the goal.
+    //Found using the Controller two test method
     public static double SPIN_UP_VELOCITY_SHORTRANGE = 950;
     public static double SPIN_UP_VELOCITY_MEDIUMRANGE = 1050;
     public static double SPIN_UP_VELOCITY_LONGRANGE = 1225;
     public static double SPIN_UP_VELOCITY_XLRANGE = 1550;
-    public static double BALL_REVERSE_SPEED = -500;
-    public static double TURRET_ROTATE_SPEED = 0.15;
-    public static double TURRET_ROTATE_SPEED_FAST = .4;
 
-    //PIDF Variables
+    // ---- Variable Created to reverse the shooter if needed to put a ball back in the robot ----- /
+    public static double BALL_REVERSE_SPEED = -500;
+
+
+    // ---- PIDF Variables to optimize shooting and reduce oscillations, overshoot, undershoot, etc ---- //
     public static double proportional = 300;
     public static double integral = 0;
     public static double derivative = 0.001;
     public static double feedForward = 10;
     public static PIDFCoefficients pidfCoefficients = new PIDFCoefficients(proportional, integral, derivative, feedForward);
 
+    // Boolean created to differentiate between whether we want to set all controls
+    // To one controller to make testing easier, or have them separate for actual driving
+    // practice or competition
     public static boolean testMode;
 
+
+    // ---- Initializes Shooter Motors With PIDF Variables and Encoders, as well as the turret rotating CRServo ----- //
     public static void init(OpMode OP, boolean isTesting) {
         op = OP;
 
@@ -58,15 +69,26 @@ public class Shooter {
 
     }
 
+    // ---- loop that checks the testing boolean to switch between Con One or Con two Controls ----- //
     public void loop() throws InterruptedException {
         if (testMode){
                 shooterConOne();
 
         } else {
             shooterConTwo();
-            rotateTurret();}
-    }
+        }
+        }
+
+    // --- Con One Controls, meant to be used only for testing purposes ----- /
     public void shooterConOne() {
+        /*
+        A = Short Range Shooting
+        B = Medium Range Shooting
+        Y = Long Range Shooting
+        LB = Turret Rotate left
+        RB = Turret Rotate right
+         */
+
         if (op.gamepad1.a){
             setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
         } else if (op.gamepad1.b){
@@ -83,7 +105,16 @@ public class Shooter {
         }
     }
 
+    // --- Con two controllers, made for practice & Competition. Subject to change ---- /
     public void shooterConTwo() {
+        /*
+        A = Short Range Shooting
+        B = Medium Range Shooting
+        Y = Long Range Shooting
+        X = Shooter goes reverse to put balls back into robot
+        LT =  Turret rotates left
+        RT = Turret rotates right
+         */
         if (op.gamepad2.a){
            setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
         } else if (op.gamepad2.b){
@@ -92,40 +123,19 @@ public class Shooter {
             setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
         } else if (op.gamepad2.x){
             setShooterPower(BALL_REVERSE_SPEED);
+        }else if (op.gamepad2.left_trigger > 0){
+            turretRotatorCR.setPower(-1);
+        }else if (op.gamepad2.right_trigger > 0){
+            turretRotatorCR.setPower(1);
         }else {
             setShooterPower(0);
+            turretRotatorCR.setPower(0);
         }
 
     }
 
-    public void rotateTurret() {
-        turretRotatorCR.setPower(op.gamepad2.right_trigger > 0 ? 1 : 0);
-        turretRotatorCR.setPower(op.gamepad2.left_trigger > 0 ? -1 : 0);
-    }
-
-    public void shooterTesterConTwo() throws InterruptedException {
-        if (op.gamepad2.dpadUpWasPressed()) {
-            TESTVELOCITY += LARGE_INCREMENT;
-        } else if (op.gamepad2.dpadDownWasPressed()) {
-            TESTVELOCITY -= LARGE_INCREMENT;
-        } else if (op.gamepad2.dpadLeftWasPressed()) {
-            TESTVELOCITY -= SMALL_INCREMENT;
-        } else if (op.gamepad2.dpadRightWasPressed()) {
-            TESTVELOCITY += SMALL_INCREMENT;
-        } else if (op.gamepad2.right_bumper) {
-            rightShooter.setVelocity(TESTVELOCITY);
-            leftShooter.setVelocity(TESTVELOCITY);
-        } else if (op.gamepad2.left_bumper) {
-            rightShooter.setVelocity(-TESTVELOCITY);
-            leftShooter.setVelocity(-TESTVELOCITY);
-        } else {
-            leftShooter.setVelocity(0);
-            rightShooter.setVelocity(0);
-        }
-
-        op.telemetry.addLine("Spin Power Left: " + leftShooter.getVelocity() + " \nSpin Power Right: " + leftShooter.getVelocity() + "\nWhat Power Should be: " + TESTVELOCITY);
-    }
-
+    // --- Two "OverLoaded" methods created to make changing velocities for both shooters simultaneously easier --- //
+    // "OverLoaded" = Two Methods with the same name and identifiers, but different parameters
     public static void setShooterPower(double Vel) {
         leftShooter.setVelocity(Vel); rightShooter.setVelocity(Vel);
     }
@@ -133,6 +143,32 @@ public class Shooter {
     public static void setShooterPower(double Vel, double shooterTurretPos, Servo turretRotator){
         leftShooter.setVelocity(Vel); rightShooter.setVelocity(Vel);
         turretRotator.setPosition(shooterTurretPos);
+    }
+
+    // ----- Method utilizing the test variables to have an adjustable velocity to find optimal velocity to hit a certain target ----- //
+    public void testerConTwo(){
+
+        // A = Set to chosen velocity
+        // Dpad L/R to change the Test Velocity by a Small increment
+        // Dpad U/D to change the Test Velocity by a Large Increment
+        // Increments can be changed above where the variables are created.
+
+        if (op.gamepad2.a){
+            setShooterPower(TESTVELOCITY);
+        } else if (op.gamepad2.dpadLeftWasPressed()){
+            TESTVELOCITY -= SMALL_INCREMENT;
+        } else if (op.gamepad2.dpadRightWasPressed()){
+            TESTVELOCITY += SMALL_INCREMENT;
+        } else if (op.gamepad2.dpadDownWasPressed()){
+            TESTVELOCITY -= LARGE_INCREMENT;
+        } else if (op.gamepad2.dpadUpWasPressed()){
+            TESTVELOCITY += LARGE_INCREMENT;
+        } else{
+            setShooterPower(0);
+        }
+
+        // ----- Telemetry To report the current velocities on both sides, as well as what it SHOULD be ----- /
+        op.telemetry.addLine("Spin Power Left: " + leftShooter.getVelocity() + " \nSpin Power Right: " + leftShooter.getVelocity() + "\nWhat Power Should be: " + TESTVELOCITY);
 
     }
 }
