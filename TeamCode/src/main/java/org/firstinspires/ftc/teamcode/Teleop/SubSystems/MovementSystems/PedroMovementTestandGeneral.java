@@ -9,11 +9,12 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 public class PedroMovementTestandGeneral {
     private Follower follower;
-    private final Pose startingPose = new Pose(8, 8, Math.toRadians(90));
+    private final Pose startingPose = new Pose(10, 10, Math.toRadians(0));
     private boolean automatedDrive;
     private TelemetryManager telemetryM;
     private double slowModeMultiplier = 0.85;
@@ -32,6 +33,7 @@ public class PedroMovementTestandGeneral {
     //------- Parking Path ---------- //
     private final Pose parkPose = new Pose(37.26829268292684, 33.521951219512204, Math.toRadians(180));
     private PathChain goPark;
+    private Telemetry telemetry;
 
     private PathChain newPathLine(Pose start, Pose end){
         return follower.pathBuilder()
@@ -73,15 +75,17 @@ public class PedroMovementTestandGeneral {
                     gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
                     -gamepad1.right_stick_x * turnSpeedDamper,
-                    false // Robot Centric
+                    true // Robot Centric
             );
         }
     }
 
     public void init(OpMode OP) {
+        telemetry = OP.telemetry;
         follower = Constants.createFollower(OP.hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
+        buildPaths();
 
         gamepad1 = OP.gamepad1;
         gamepad2 = OP.gamepad2;
@@ -99,13 +103,11 @@ public class PedroMovementTestandGeneral {
     public void loop() {
         follower.update();
         telemetryM.update();
-        buildPaths();
         drive();
-        teleOpPathFollower();
 
-        telemetryM.debug("position", follower.getPose());
-        telemetryM.debug("velocity", follower.getVelocity());
-        telemetryM.debug("automatedDrive", automatedDrive);
+        telemetry.addData("position", follower.getPose());
+        telemetry.addData("velocity", follower.getVelocity());
+        telemetry.addData("automatedDrive", automatedDrive);
     }
 }
 

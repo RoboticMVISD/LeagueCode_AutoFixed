@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.PedroMov
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 
-@TeleOp (name = "Main-Testing-OneCon")
+@TeleOp (name = "Main-Testing-TwoCon")
 public class TestingMainTwoCon extends OpMode {
 
     PedroMovementTestandGeneral pedroMTG = new PedroMovementTestandGeneral();

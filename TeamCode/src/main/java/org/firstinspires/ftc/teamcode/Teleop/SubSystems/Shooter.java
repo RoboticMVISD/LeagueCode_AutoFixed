@@ -54,13 +54,14 @@ public class Shooter {
 
         leftShooter = op.hardwareMap.get(DcMotorEx.class, "leftShooter");
         leftShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftShooter.setDirection(DcMotorSimple.Direction.FORWARD);
         leftShooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         leftShooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
         rightShooter = op.hardwareMap.get(DcMotorEx.class, "rightShooter");
         rightShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightShooter.setDirection(DcMotorSimple.Direction.REVERSE);
         rightShooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightShooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         rightShooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);

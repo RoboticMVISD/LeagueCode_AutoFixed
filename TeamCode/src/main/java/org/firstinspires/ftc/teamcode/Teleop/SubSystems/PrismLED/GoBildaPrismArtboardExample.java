@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -21,7 +22,7 @@ import static org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.GoBildaP
  */
 
 @TeleOp(name="Prism Artboard Example", group="Linear OpMode")
-//@Disabled
+@Disabled
 
 public class GoBildaPrismArtboardExample extends LinearOpMode {
 

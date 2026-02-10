@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.testAndOldClasses;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 //Control HUB
@@ -43,8 +44,8 @@ public class Movement {
         // motors are opposite to the right ones.
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // This uses RUN_WITHOUT_ENCODER because we are using the dead wheels.
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

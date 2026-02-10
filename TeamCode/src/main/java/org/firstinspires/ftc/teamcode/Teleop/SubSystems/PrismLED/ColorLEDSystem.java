@@ -24,6 +24,7 @@ package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -52,7 +53,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 
 @TeleOp(name="Prism Animations Example", group="Linear OpMode")
-//@Disabled
+@Disabled
 
 public class ColorLEDSystem extends LinearOpMode {
 

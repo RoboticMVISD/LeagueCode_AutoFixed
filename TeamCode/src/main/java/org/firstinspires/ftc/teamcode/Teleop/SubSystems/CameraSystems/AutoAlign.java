@@ -4,15 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.testAndOldClasses.Movement;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @TeleOp (name = "Auto Align Test")
 public class AutoAlign extends OpMode {
 
     private final WebCam webCam = new WebCam();
-    private final Movement drive = new Movement();
-
+    private Movement movement = new Movement();
     // ------------- PD Controller ----------------
     double kP = 0.002;
     double error = 0;
@@ -29,12 +29,11 @@ public class AutoAlign extends OpMode {
     //--------------- Controller Based PD Tuning ------------
     double [] stepSizes = {1.0, .1, 0.001, 0.0001};
     int stepIndex = 2;
+    Telemetry tele = this.telemetry;
 
     public void init(){
         webCam.init(this);
-        drive.init(this.hardwareMap);
-
-        telemetry.addLine("Initialized");
+        movement.init(this.hardwareMap);
     }
 
     public void start(){
@@ -76,7 +75,6 @@ public class AutoAlign extends OpMode {
             else {
                 lastTime = getRuntime();
                 lastError = 0;
-                rotate = gamepad1.right_stick_x;
             }
         } else {
             lastError = 0;
@@ -84,7 +82,7 @@ public class AutoAlign extends OpMode {
         }
 
         //Drive Our Motors
-        drive.drive(forward, strafe, rotate);
+        movement.drive(forward, strafe, rotate);
 
         if (gamepad1.bWasPressed()){
             stepIndex = (stepIndex - 1) % stepSizes.length;
@@ -109,17 +107,22 @@ public class AutoAlign extends OpMode {
         //------- Telemetry --------
         if (id20 != null){
             if (gamepad1.left_trigger > 0.3){
-                telemetry.addLine("AUTO ALIGN");
+                tele.addLine("AUTO ALIGN");
             }
-            telemetry.addData("Error", error);
+            tele.addData("Error", error);
         } else {
-            telemetry.addLine("MANUAL ROTATE MODE");
+            tele.addLine("MANUAL ROTATE MODE");
         }
-        telemetry.addLine("--------------------");
-        telemetry.addData("Tuning P: ", "%.4f (Dpad L/R)", kP);
-        telemetry.addData("Tuning D: ", "%.4f (Dpad U/D)", kD);
-        telemetry.addData("Step Size: ", "%.4f (B button)", stepSizes[stepIndex]);
+        tele.addLine("--------------------");
+        tele.addData("Tuning P: ", "%.4f (Dpad L/R)", kP);
+        tele.addData("Tuning D: ", "%.4f (Dpad U/D)", kD);
+        tele.addData("Step Size: ", "%.4f (B button)", stepSizes[stepIndex]);
+        webCam.telemetryUpdate();
 
+    }
+
+    public void stop(){
+        webCam.stop();
     }
 
 }
