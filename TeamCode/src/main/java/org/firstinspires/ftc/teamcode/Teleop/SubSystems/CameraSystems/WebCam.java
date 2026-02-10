@@ -44,6 +44,7 @@ public class WebCam {
         builder.addProcessor(processor);
 
         portal = builder.build();
+        processor.setDecimation(3);
 
         setManualExposure(6, 240);
     }

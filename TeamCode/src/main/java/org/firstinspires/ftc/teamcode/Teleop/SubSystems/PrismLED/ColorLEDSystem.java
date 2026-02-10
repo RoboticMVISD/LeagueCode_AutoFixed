@@ -20,16 +20,12 @@
  *   SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.Teleop.SubSystems;
+package org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED;
 
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.GoBildaPrismDriver;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.PrismAnimations;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.PrismLED.Color;
 
 /*
  * This example file shows how to create a couple of different Animations on the Prism, and save

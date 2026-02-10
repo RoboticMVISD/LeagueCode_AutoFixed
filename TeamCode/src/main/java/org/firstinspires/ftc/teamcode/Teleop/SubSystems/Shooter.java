@@ -8,8 +8,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Teleop.OpModes.Main;
-
 public class Shooter {
     static OpMode op;
     public static DcMotorEx leftShooter, rightShooter;
