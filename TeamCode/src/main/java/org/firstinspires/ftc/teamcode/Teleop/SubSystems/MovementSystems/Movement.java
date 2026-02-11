@@ -29,7 +29,7 @@ public class Movement {
     private static DcMotor backRightDrive = null;
 
     // TODO: likely change this back to 1
-    private final double SPIN_DAMPING = 1.4;   // higher means slower turning
+    private static final double SPIN_DAMPING = 1.4;   // higher means slower turning
 
     public static void init(HardwareMap hwMap) {
 
@@ -64,7 +64,7 @@ public class Movement {
         //telemetry.update();
     }
 
-    public void drive(double axial, double lateral, double yaw) {
+    public static void drive(double axial, double lateral, double yaw) {
 
         // apply damping to spin
         yaw /= SPIN_DAMPING;

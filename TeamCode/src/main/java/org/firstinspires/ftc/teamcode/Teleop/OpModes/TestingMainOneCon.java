@@ -6,35 +6,33 @@ import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.PedroMovementTestandGeneral;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.autoPathingSystems.AutoPathingTeleRed;
 
 
 @TeleOp (name = "Main-Testing-OneCon")
 public class TestingMainOneCon extends OpMode {
 
-    PedroMovementTestandGeneral pedroMTG = new PedroMovementTestandGeneral();
     Intake intake = new Intake();
     Shooter shooter = new Shooter();
-    Movement movement = new Movement();
+    AutoPathingTeleRed autoPathRed = new AutoPathingTeleRed();
 
     @Override
     public void init()
     {
         intake.init(this);
-        //pedroMTG.init(this);
         shooter.init(this, true);
-        Movement.init(this.hardwareMap);
+        autoPathRed.init(this);
     }
 
     @Override
     public void start(){
-        //pedroMTG.start();
+        autoPathRed.start();
     }
 
     @Override
     public void loop(){
         intake.loop();
-        //pedroMTG.loop();
-        movement.drive(this.gamepad1.left_stick_y, -this.gamepad1.left_stick_x, -this.gamepad1.right_stick_x);
+        autoPathRed.loop();
 
         try {
             shooter.loop();

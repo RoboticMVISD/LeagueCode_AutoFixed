@@ -17,48 +17,26 @@ import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
-public class ExampleTeleOp extends OpMode {
+public class PedroMovementTest extends OpMode {
     private Follower follower;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
-    private boolean slowMode = true;
-    private double slowModeMultiplier = 0.8;
-    private double turnSpeedMultiplier = 0.5;
-
-    //------- Lever Path --------- //
-    private final Pose hitLeverPose = new Pose(128, 70.57972350230413, Math.toRadians(90));
-    private PathChain hitLever;
-
-    // ----- Shoot Path -------- //
-    private final Pose shootPose = new Pose(102.230, 98.032, Math.toRadians(36));
-    private PathChain goToShoot;
-
-    //------- Parking Path ---------- //
-    private final Pose parkPose = new Pose(37.26829268292684, 33.521951219512204, Math.toRadians(180));
-    private PathChain goPark;
-
-    private PathChain newPathLine(Pose start, Pose end){
-        return follower.pathBuilder()
-                .addPath(new BezierLine(start, end))
-                .setLinearHeadingInterpolation(start.getHeading(), end.getHeading())
-                .build();
-    }
-
-    public void buildPaths(){
-        follower.update();
-        hitLever = newPathLine(follower.getPose(), hitLeverPose);
-        goToShoot = newPathLine(follower.getPose(), shootPose);
-        goPark = newPathLine(follower.getPose(), parkPose);
-    }
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.5;
 
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose == null ? new Pose(8,8, Math.toRadians(0)) : startingPose);
+        follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
+        follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-        buildPaths();
+
+        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .build();
     }
 
     @Override
@@ -82,29 +60,45 @@ public class ExampleTeleOp extends OpMode {
             //This is the normal version to use in the TeleOp
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
-                    gamepad1.right_stick_x,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
                     true // Robot Centric
             );
+
                 //This is how it looks with slowMode on
             else follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * slowModeMultiplier,
-                    gamepad1.left_stick_x * slowModeMultiplier,
-                    gamepad1.right_stick_x * turnSpeedMultiplier,
+                    -gamepad1.left_stick_x * slowModeMultiplier,
+                    -gamepad1.right_stick_x * slowModeMultiplier,
                     true // Robot Centric
             );
         }
 
         //Automated PathFollowing
-        if (gamepad1.dpadLeftWasPressed()) {
-            follower.followPath(hitLever);
+        if (gamepad1.aWasPressed()) {
+            follower.followPath(pathChain.get());
             automatedDrive = true;
         }
 
         //Stop automated following if the follower is done
-        if (automatedDrive && (gamepad1.dpadDownWasPressed() || !follower.isBusy())) {
+        if (automatedDrive && (gamepad1.bWasPressed() || !follower.isBusy())) {
             follower.startTeleopDrive();
             automatedDrive = false;
+        }
+
+        //Slow Mode
+        if (gamepad1.rightBumperWasPressed()) {
+            slowMode = !slowMode;
+        }
+
+        //Optional way to change slow mode strength
+        if (gamepad1.xWasPressed()) {
+            slowModeMultiplier += 0.25;
+        }
+
+        //Optional way to change slow mode strength
+        if (gamepad2.yWasPressed()) {
+            slowModeMultiplier -= 0.25;
         }
 
         telemetryM.debug("position", follower.getPose());
