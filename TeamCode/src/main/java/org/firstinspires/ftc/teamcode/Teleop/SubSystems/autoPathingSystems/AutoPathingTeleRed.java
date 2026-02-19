@@ -75,9 +75,9 @@ public class AutoPathingTeleRed {
                 fieldCentricDrive.drive(gamepad1);
             } else {
                 Movement.drive(
-                        gamepad1.left_stick_y,
-                        -gamepad1.left_stick_x,
-                        -gamepad1.right_stick_x
+                        -gamepad1.left_stick_y,
+                        gamepad1.left_stick_x,
+                        gamepad1.right_stick_x
                 );
             }
         }
@@ -96,9 +96,7 @@ public class AutoPathingTeleRed {
     }
 
     public void start() {
-        //In order to use float mode, add .useBrakeModeInTeleOp(true); to your Drivetrain Constants in Constant.java (for Mecanum)
-        //If you don't pass anything in, it uses the default (false)
-        follower.startTeleopDrive(true);
+
     }
 
     public void loop() {

@@ -32,7 +32,7 @@ public class RedClose15Test extends OpMode {
     private StageOne currentStage;
 
     // --- Poses ---
-    private final Pose startPose = new Pose(127.07, 109.93, Math.toRadians(0));
+    private final Pose startPose = new Pose(126.07, 109.93, Math.toRadians(0));
     private final Pose shootPose = new Pose(102.23, 98.03, Math.toRadians(44));
     private final Pose rowOneStart = new Pose(99.82, 80.58, Math.toRadians(0));
     private final Pose rowOneEnd = new Pose(124.50, 80.58, Math.toRadians(0));
@@ -71,7 +71,7 @@ public class RedClose15Test extends OpMode {
         timesRowIntaken = 0;
 
         buildPaths();
-        currentStage = StageOne.SHOOT_PRELOAD;
+        currentStage = StageOne.DRIVE_SET_UP_PRELOAD_SHOOT;
         pathTimer.resetTimer();
     }
 

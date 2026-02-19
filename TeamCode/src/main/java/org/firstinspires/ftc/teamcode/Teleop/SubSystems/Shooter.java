@@ -8,6 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
+
 public class Shooter {
     // --------- Making an OpMode object to use for hardware maps, gamepads, etc ------------ //
     static OpMode op;
@@ -44,6 +47,8 @@ public class Shooter {
     // To one controller to make testing easier, or have them separate for actual driving
     // practice or competition
     public static boolean testMode;
+    private static double currentTurretPosition;
+    private static Telemetry telemetry;
 
 
     // ---- Initializes Shooter Motors With PIDF Variables and Encoders, as well as the turret rotating CRServo ----- //
@@ -68,6 +73,7 @@ public class Shooter {
 
         turretRotatorCR = op.hardwareMap.crservo.get("turretRotatorCR");
 
+        telemetry = OP.telemetry;
     }
 
     // ---- loop that checks the testing boolean to switch between Con One or Con two Controls ----- //
@@ -78,6 +84,8 @@ public class Shooter {
         } else {
             shooterConTwo();
         }
+
+        turretTracker();
         }
 
     // --- Con One Controls, meant to be used only for testing purposes ----- /
@@ -171,5 +179,11 @@ public class Shooter {
         // ----- Telemetry To report the current velocities on both sides, as well as what it SHOULD be ----- /
         op.telemetry.addLine("Spin Power Left: " + leftShooter.getVelocity() + " \nSpin Power Right: " + leftShooter.getVelocity() + "\nWhat Power Should be: " + TESTVELOCITY);
 
+    }
+
+    public void turretTracker(){
+        currentTurretPosition = Movement.frontLeftDrive.getCurrentPosition();
+        telemetry.addData("Current Turret Position: ", currentTurretPosition);
+        telemetry.update();
     }
 }

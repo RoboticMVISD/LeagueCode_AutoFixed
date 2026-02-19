@@ -42,20 +42,28 @@ public class AutoAlign extends OpMode {
     }
 
     public void loop(){
-        //------------- Get Drive Inputs ----------------
-        forward = -gamepad1.left_stick_y;
-        strafe = gamepad1.left_stick_x;
-        rotate = gamepad1.right_stick_x;
-
         //------ get AprilTag Info --------
         webCam.update();
         AprilTagDetection id20 = webCam.getTagBySpecificId(20);
+        autoAlignLogic(id20);
+        TelemetryAuto(id20);
+        tuningprocess();
 
-        // ---------- Auto Align Rotation Logic -----------
-        if (gamepad1.left_trigger > 0.3){
+        //Drive Our Motors
+        Movement.drive(forward, strafe, rotate);
+    }
+    public void autoAlignLogic(AprilTagDetection detection){
+
+        //------------- Get Drive Inputs ----------------//
+
+        forward = gamepad1.left_stick_y;
+        strafe = -gamepad1.left_stick_x;
+        rotate = -gamepad1.right_stick_x;
+
+        if (gamepad1.a){
             //Ensures we are seeing a tag & Pressing Trigger
-            if (id20 != null){
-                error = goalX - id20.ftcPose.bearing; //tx
+            if (detection != null){
+                error = goalX - detection.ftcPose.bearing; //tx
 
                 if (Math.abs(error) < angleTolerance){
                     rotate = 0;
@@ -80,10 +88,9 @@ public class AutoAlign extends OpMode {
             lastError = 0;
             lastError = getRuntime();
         }
+    }
 
-        //Drive Our Motors
-        movement.drive(forward, strafe, rotate);
-
+    public void tuningprocess(){
         if (gamepad1.bWasPressed()){
             stepIndex = (stepIndex - 1) % stepSizes.length;
         }
@@ -103,10 +110,10 @@ public class AutoAlign extends OpMode {
         if (gamepad1.dpadDownWasPressed()){
             kD -= stepSizes[stepIndex];
         }
-
-        //------- Telemetry --------
-        if (id20 != null){
-            if (gamepad1.left_trigger > 0.3){
+    }
+    public void TelemetryAuto(AprilTagDetection detection){
+        if (detection != null){
+            if (gamepad1.a){
                 tele.addLine("AUTO ALIGN");
             }
             tele.addData("Error", error);
@@ -118,7 +125,6 @@ public class AutoAlign extends OpMode {
         tele.addData("Tuning D: ", "%.4f (Dpad U/D)", kD);
         tele.addData("Step Size: ", "%.4f (B button)", stepSizes[stepIndex]);
         webCam.telemetryUpdate();
-
     }
 
     public void stop(){

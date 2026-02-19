@@ -9,8 +9,8 @@ public class FieldCentricDrive {
     private final Follower follower;
 
     // Optional speed scaling
-    private double driveSpeedMultiplier = .8;
-    private double turnDamper = 0.6;
+    private double driveSpeedMultiplier = 3;
+    private double turnDamper = 1;
 
     public FieldCentricDrive(Follower follower) {
         this.follower = follower;
@@ -20,8 +20,8 @@ public class FieldCentricDrive {
     public void drive(Gamepad gamepad) {
 
         // Get joystick input
-        double y = -gamepad.left_stick_y;   // Forward is negative on gamepad
-        double x = gamepad.left_stick_x;
+        double y = gamepad.left_stick_y;   // Forward is negative on gamepad
+        double x = -gamepad.left_stick_x;
         double turn = -gamepad.right_stick_x;
 
         // Get robot heading from Pedro

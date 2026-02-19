@@ -23,13 +23,14 @@ public class Movement {
 
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
-    private static DcMotor frontLeftDrive = null;
+    public static DcMotor frontLeftDrive = null;
     private static DcMotor backLeftDrive = null;
     private static DcMotor frontRightDrive = null;
     private static DcMotor backRightDrive = null;
 
     // TODO: likely change this back to 1
-    private static final double SPIN_DAMPING = 1.4;   // higher means slower turning
+    private static final double SPIN_DAMPING = 1.4; // higher means slower turning
+    private double currentTurretPosition;
 
     public static void init(HardwareMap hwMap) {
 
@@ -42,10 +43,10 @@ public class Movement {
 
         // Set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // This uses RUN_WITHOUT_ENCODER because we are using the dead wheels.
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

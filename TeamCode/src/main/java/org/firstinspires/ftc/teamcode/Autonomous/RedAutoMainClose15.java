@@ -300,6 +300,7 @@ public class RedAutoMainClose15 extends OpMode{
 
 
         follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
 
 
         Intake.init(this);
@@ -309,7 +310,6 @@ public class RedAutoMainClose15 extends OpMode{
         turretRotator.setDirection(Servo.Direction.REVERSE);
 
         buildPaths();
-        follower.setPose(startPose);
     }
 
     public void start(){
