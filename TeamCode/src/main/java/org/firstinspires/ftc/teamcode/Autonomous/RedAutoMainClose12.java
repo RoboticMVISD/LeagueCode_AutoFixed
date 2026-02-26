@@ -45,8 +45,8 @@ public class RedAutoMainClose12 extends OpMode{
     private final Pose startPose = new Pose(127.073732718894, 109.92626728110596, Math.toRadians(0));
     private final Pose shootPose = new Pose(102.230, 98.032, Math.toRadians(36));
     private final Pose shootPoseEX = new Pose(102.230, 98.032, Math.toRadians(45));
-    private final Pose preHitLever = new Pose(120, 70.57972350230413, Math.toRadians(90));
-    private final Pose hitLeverPose = new Pose(128, 70.57972350230413, Math.toRadians(90));
+    private final Pose preHitLever = new Pose(120, 70.57972350230413, Math.toRadians(0));
+    private final Pose hitLeverPose = new Pose(127.5, 70.57972350230413, Math.toRadians(0));
     private final Pose rowOneStart = new Pose(99.820, 80.57972350230413, Math.toRadians(0));
     private final Pose rowOneEnd = new Pose(126.50241820768138, 80.57972350230413  , Math.toRadians(0));
     private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
@@ -63,7 +63,7 @@ public class RedAutoMainClose12 extends OpMode{
     }
     private PathStateTwo pathStateTwo;
     private final Pose rowTwoStart = new Pose(99.76036866359446, 56.866359447004605, Math.toRadians(0));
-    private final Pose rowTwoEnd = new Pose(134.04608294930875, 56.39631336405527, Math.toRadians(0));
+    private final Pose rowTwoEnd = new Pose(130.04608294930875, 56.39631336405527, Math.toRadians(0));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -273,7 +273,7 @@ public class RedAutoMainClose12 extends OpMode{
     }
     private void shootFromMedium() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .5, turretRotator);
+        Shooter.setShooterPower(spped, .35, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -282,7 +282,7 @@ public class RedAutoMainClose12 extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .45, turretRotator);
+        Shooter.setShooterPower(spped, .36, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -345,9 +345,9 @@ public class RedAutoMainClose12 extends OpMode{
     public void timerStages(Timer time){
         if (opModeTimer.getElapsedTimeSeconds() < 11){
             pathStateUpdateOne();
-        }else if (opModeTimer.getElapsedTimeSeconds() > 11 && opModeTimer.getElapsedTimeSeconds() < 19){
+        }else if (opModeTimer.getElapsedTimeSeconds() > 11 && opModeTimer.getElapsedTimeSeconds() < 20.3){
             pathStateUpdateTwo();
-        }else if (opModeTimer.getElapsedTimeSeconds() > 19 && opModeTimer.getElapsedTimeSeconds() < 28){
+        }else if (opModeTimer.getElapsedTimeSeconds() > 20.3 && opModeTimer.getElapsedTimeSeconds() < 30){
             pathStateUpdateThree();
         }else {
             turnOffSystems();

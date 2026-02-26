@@ -19,8 +19,8 @@ public class TestingMainOneCon extends OpMode {
     @Override
     public void init()
     {
-        intake.init(this);
-        shooter.init(this, true);
+        Intake.init(this);
+        Shooter.init(this, true);
         autoPathRed.init(this);
     }
 
