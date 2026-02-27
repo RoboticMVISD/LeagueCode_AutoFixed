@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.CameraSystems.BetterLimelightAutoAim;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
 
 public class Shooter {
@@ -100,19 +101,24 @@ public class Shooter {
         RB = Turret Rotate right
          */
 
-        if (op.gamepad1.a){
-            setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
-        } else if (op.gamepad1.b){
-            setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
-        } else if (op.gamepad1.y){
-            setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
-        } else if (op.gamepad1.left_bumper){
-            turretRotatorCR.setPower(-1);
-        }else if (op.gamepad1.right_bumper){
-            turretRotatorCR.setPower(1);
-        }else {
-            setShooterPower(0);
-            turretRotatorCR.setPower(0);
+        if (!BetterLimelightAutoAim.launcherRequested) {
+            if (op.gamepad1.a) {
+                setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
+            } else if (op.gamepad1.b) {
+                setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
+            } else if (op.gamepad1.y) {
+                setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
+            } else {
+                setShooterPower(0);
+            }
+
+        if (op.gamepad1.left_bumper) {
+            setRotatorPower(-1);
+        } else if (op.gamepad1.right_bumper) {
+            setRotatorPower(1);
+        } else if (!BetterLimelightAutoAim.aimEnabled){
+            setRotatorPower(0);
+        }
         }
     }
 
@@ -126,24 +132,26 @@ public class Shooter {
         LT =  Turret rotates left
         RT = Turret rotates right
          */
-        if (op.gamepad2.a){
-           setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
-        } else if (op.gamepad2.b){
-            setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
-        } else if (op.gamepad2.y){
-            setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
-        } else if (op.gamepad2.x){
-            setShooterPower(BALL_REVERSE_SPEED);
-        }else if (op.gamepad2.left_trigger > 0){
-            turretRotatorCR.setPower(-.5);
-            turretRotatorCR2.setPower(-.5);
+        if (!BetterLimelightAutoAim.launcherRequested){
+            if (op.gamepad2.a){
+               setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
+            } else if (op.gamepad2.b){
+                setShooterPower(SPIN_UP_VELOCITY_MEDIUMRANGE);
+            } else if (op.gamepad2.y){
+                setShooterPower(SPIN_UP_VELOCITY_LONGRANGE);
+            } else if (op.gamepad2.x){
+                setShooterPower(BALL_REVERSE_SPEED);
+            }else {
+                setShooterPower(0);
+            }
+        }
+
+        if (op.gamepad2.left_trigger > 0){
+            setRotatorPower(-.5);
         }else if (op.gamepad2.right_trigger > 0){
-            turretRotatorCR.setPower(.5);
-            turretRotatorCR2.setPower(.5);
-        }else {
-            setShooterPower(0);
-            turretRotatorCR.setPower(0);
-            turretRotatorCR2.setPower(0);
+            setRotatorPower(.5);
+        } else if (!BetterLimelightAutoAim.aimEnabled){
+            setRotatorPower(0);
         }
 
     }
@@ -166,20 +174,20 @@ public class Shooter {
         // Dpad L/R to change the Test Velocity by a Small increment
         // Dpad U/D to change the Test Velocity by a Large Increment
         // Increments can be changed above where the variables are created.
-
-        if (op.gamepad2.a){
+        if (!BetterLimelightAutoAim.launcherRequested){
+             if (op.gamepad2.a){
             setShooterPower(TESTVELOCITY);
-        } else if (op.gamepad2.dpadLeftWasPressed()){
+            } else if (op.gamepad2.dpadLeftWasPressed()){
             TESTVELOCITY -= SMALL_INCREMENT;
-        } else if (op.gamepad2.dpadRightWasPressed()){
-            TESTVELOCITY += SMALL_INCREMENT;
-        } else if (op.gamepad2.dpadDownWasPressed()){
-            TESTVELOCITY -= LARGE_INCREMENT;
-        } else if (op.gamepad2.dpadUpWasPressed()){
-            TESTVELOCITY += LARGE_INCREMENT;
-        } else{
-            setShooterPower(0);
-        }
+            } else if (op.gamepad2.dpadRightWasPressed()){
+                TESTVELOCITY += SMALL_INCREMENT;
+            } else if (op.gamepad2.dpadDownWasPressed()){
+                TESTVELOCITY -= LARGE_INCREMENT;
+            } else if (op.gamepad2.dpadUpWasPressed()){
+                TESTVELOCITY += LARGE_INCREMENT;
+            } else {
+                setShooterPower(0);
+            } }
 
         // ----- Telemetry To report the current velocities on both sides, as well as what it SHOULD be ----- /
         op.telemetry.addLine("Spin Power Left: " + leftShooter.getVelocity() + " \nSpin Power Right: " + leftShooter.getVelocity() + "\nWhat Power Should be: " + TESTVELOCITY);
@@ -190,5 +198,10 @@ public class Shooter {
         currentTurretPosition = Movement.frontLeftDrive.getCurrentPosition();
         telemetry.addData("Current Turret Position: ", currentTurretPosition);
         telemetry.update();
+    }
+
+    public static void setRotatorPower(double power){
+        turretRotatorCR2.setPower(power);
+        turretRotatorCR.setPower(power);
     }
 }
