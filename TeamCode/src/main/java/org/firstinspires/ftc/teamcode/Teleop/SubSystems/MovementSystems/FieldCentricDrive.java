@@ -20,7 +20,7 @@ public class FieldCentricDrive {
     public void drive(Gamepad gamepad) {
 
         // Get joystick input
-        double y = gamepad.left_stick_y;   // Forward is negative on gamepad
+        double y = -gamepad.left_stick_y;   // Forward is negative on gamepad
         double x = -gamepad.left_stick_x;
         double turn = -gamepad.right_stick_x;
 

@@ -16,7 +16,7 @@ public class Shooter {
     static OpMode op;
     // -------- Objects for the hardware being used by turret & shooters //
     public static DcMotorEx leftShooter, rightShooter;
-    public static CRServo turretRotatorCR;
+    public static CRServo turretRotatorCR, turretRotatorCR2;
 
 
     // ----- Variables for the controller two tester to find a optimal velocity for a certain range ------ //
@@ -72,6 +72,8 @@ public class Shooter {
         rightShooter.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidfCoefficients);
 
         turretRotatorCR = op.hardwareMap.crservo.get("turretRotatorCR");
+        turretRotatorCR2 = op.hardwareMap.crservo.get("turretRotatorCR2");
+        turretRotatorCR2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         telemetry = OP.telemetry;
     }
@@ -133,12 +135,15 @@ public class Shooter {
         } else if (op.gamepad2.x){
             setShooterPower(BALL_REVERSE_SPEED);
         }else if (op.gamepad2.left_trigger > 0){
-            turretRotatorCR.setPower(-1);
+            turretRotatorCR.setPower(-.5);
+            turretRotatorCR2.setPower(-.5);
         }else if (op.gamepad2.right_trigger > 0){
-            turretRotatorCR.setPower(1);
+            turretRotatorCR.setPower(.5);
+            turretRotatorCR2.setPower(.5);
         }else {
             setShooterPower(0);
             turretRotatorCR.setPower(0);
+            turretRotatorCR2.setPower(0);
         }
 
     }

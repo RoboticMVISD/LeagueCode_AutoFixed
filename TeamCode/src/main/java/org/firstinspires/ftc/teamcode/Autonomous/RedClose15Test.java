@@ -127,9 +127,9 @@ public class RedClose15Test extends OpMode {
                 break;
 
             case DRIVE_ROW_ONE:
-                if (!follower.isBusy())
+                if (!follower.isBusy()){
                     follower.followPath(driveFirstRowPath, true);
-                    advanceStage(StageOne.INTAKE_ROW_ONE);
+                    advanceStage(StageOne.INTAKE_ROW_ONE);}
                 break;
 
             case INTAKE_ROW_ONE:
@@ -263,6 +263,7 @@ public class RedClose15Test extends OpMode {
     // --- Shooter Helper ---
     private void runShooter(Timer timer, double durationSeconds) {
         Shooter.setShooterPower(MEDIUM_SHOOT_SPEED, 0.48, turretRotator);
+
         if (Shooter.rightShooter.getVelocity() > MEDIUM_SHOOT_SPEED - VELOCITY_TOLERANCE &&
                 Shooter.rightShooter.getVelocity() < MEDIUM_SHOOT_SPEED + VELOCITY_TOLERANCE) {
             Intake.setBothIntakePower(1);
