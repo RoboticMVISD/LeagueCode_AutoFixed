@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.CameraSystems.AutoAim_Distance;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.RedMovement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 
@@ -11,22 +13,28 @@ public class TestingMainTwoCon extends OpMode {
 
     Intake intake = new Intake();
     Shooter shooter = new Shooter();
+    RedMovement redMovement = new RedMovement();
+    AutoAim_Distance autoAim = new AutoAim_Distance();
 
     @Override
     public void init()
     {
-        intake.init(this);
-        shooter.init(this, false);
+        redMovement.init(this);
+        Intake.init(this);
+        Shooter.init(this, false);
+        autoAim.init(this);
     }
 
     @Override
     public void start(){
-
+        redMovement.start();
     }
 
     @Override
     public void loop(){
         intake.loop();
+        redMovement.loop();
+        autoAim.loop(false);
 
         try {
             shooter.loop();

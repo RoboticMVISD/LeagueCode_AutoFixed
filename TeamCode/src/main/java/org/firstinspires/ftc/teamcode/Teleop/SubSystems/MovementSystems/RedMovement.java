@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 @Configurable
 public class RedMovement  {
     private Follower follower;
-    public static Pose startingPose;
+    public static Pose startingPose = new Pose(0,0, Math.toRadians(0));
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;

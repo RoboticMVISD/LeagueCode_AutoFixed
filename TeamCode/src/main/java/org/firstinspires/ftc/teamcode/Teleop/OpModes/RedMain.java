@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Teleop.OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.PedroMovementRed;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.RedMovement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
