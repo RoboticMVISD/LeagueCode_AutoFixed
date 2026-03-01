@@ -10,14 +10,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
+import org.firstinspires.ftc.teamcode.testAndOldClasses.Movement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
 @Autonomous (name = "RedAuto12")
-public class RedMain15Improved extends OpMode{
+public class Red12Ball extends OpMode{
 
     /*
     How this auto will work code wise is that it will have three separate methods which hold case statements.
@@ -30,11 +30,22 @@ public class RedMain15Improved extends OpMode{
 
     //Variables & Enum For Shooting/Getting Preload and First Row of Balls
     private enum PathStateOne {
-        DRIVE_GETTING_INTO_SHOOT_POS, SHOOT_PRELOAD,
-        DRIVE_1ST_ROW_POS, HIT_LEVER, SET_UP_LEVER_HIT, DRIVE_RESET_MID_ONE, SHOOT_FIRST_ROW,
-        DRIVE_2ND_ROW_POS, INTAKE_2ND_ROW, DRIVE_BACK_ROW_TWO, DRIVE_RESET_MID_TWO, SHOOT_SECOND_ROW,
-        DRIVE_3RD_ROW_POS, DRIVE_RESET_MID_THREE, INTAKE_THIRD_ROW, SHOOT_THIRD_ROW,
-        DRIVE_PREINTAKE_RAMP, DRIVE_SET_UP_RAMP, INTAKE_RAMP, DRIVE_RESET, DRIVE_SHOOT_RAMP_POSITION, SHOOT_RAMP,
+        DRIVE_GETTING_INTO_SHOOT_POS,
+        SHOOT_PRELOAD,
+        DRIVE_1ST_ROW_POS,
+        HIT_LEVER,
+        SET_UP_LEVER_HIT,
+        DRIVE_RESET_MID_ONE,
+        SHOOT_FIRST_ROW,
+        DRIVE_2ND_ROW_POS,
+        INTAKE_2ND_ROW,
+        DRIVE_BACK_ROW_TWO,
+        DRIVE_RESET_MID_TWO,
+        SHOOT_SECOND_ROW,
+        DRIVE_3RD_ROW_POS,
+        DRIVE_RESET_MID_THREE,
+        INTAKE_THIRD_ROW,
+        SHOOT_THIRD_ROW,
         DRIVE_PARK;
 
     }
@@ -66,16 +77,7 @@ public class RedMain15Improved extends OpMode{
     private final Pose parkPose = new Pose(120, 70.57972350230413, Math.toRadians(0));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
 
-    //Ramp Variables
-    private final Pose preIntakeRampPose = new Pose(110,60, Math.toRadians(0));
-    private final Pose setUpIntakeRamp = new Pose(128,56, Math.toRadians(20));
-    private final Pose intakeRampPose = new Pose(132,52, Math.toRadians(60));
-    private PathChain drivePreIntakeRampPath, setUpRampPath, intakeRampPath, driveReset, shootRampPath, driveParkPath;
-
-
     private Timer pathTimer, opModeTimer;
-    private static final double MEDIUM_SHOOT_SPEED = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-    private int timesRowIntaken;
 
 
 
@@ -130,8 +132,39 @@ public class RedMain15Improved extends OpMode{
                 } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
                     turnOffSystems();
                     follower.followPath(getIntoRowOnePos, true);
-                    setPathStateOne(PathStateOne.DRIVE_2ND_ROW_POS);
+                    setPathStateOne(PathStateOne.DRIVE_1ST_ROW_POS);
                 } break;
+            case DRIVE_1ST_ROW_POS: //Works
+                if (!follower.isBusy()){
+                    intakeBalls(pathTimer);
+                    follower.followPath(getFirstRow, true);
+                    setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
+                } break;
+            case SET_UP_LEVER_HIT:
+                if (!follower.isBusy()){
+                    follower.followPath(readyToHitLever, true);
+                    setPathStateOne(PathStateOne.HIT_LEVER);
+                } break;
+            case HIT_LEVER:
+                if (!follower.isBusy()){
+                    follower.followPath(hitLever,.8,false);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
+                }break;
+            case DRIVE_RESET_MID_ONE: // Works
+                if (!follower.isBusy()) {
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
+                    follower.followPath(resetBackOne, true);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
+                    setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
+                } break;
+            case SHOOT_FIRST_ROW: //Works
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.3){
+                    shootFromMediumEX();
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
+                    turnOffSystems();
+                    setPathStateOne(PathStateOne.DRIVE_2ND_ROW_POS);
+                }
+                break;
             case DRIVE_2ND_ROW_POS:  //Works
                 if (!follower.isBusy()){
                     turnOffSystems();
@@ -161,85 +194,35 @@ public class RedMain15Improved extends OpMode{
                     shootFromMedium();
                 } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
                     turnOffSystems();
-                    setPathStateOne(PathStateOne.DRIVE_PREINTAKE_RAMP);
+                    setPathStateOne(PathStateOne.DRIVE_3RD_ROW_POS);
                 } break;
-            case DRIVE_PREINTAKE_RAMP:
-                if (!follower.isBusy()) {
-                    follower.followPath(drivePreIntakeRampPath, true);
-                    setPathStateOne(PathStateOne.INTAKE_RAMP);
-                }
-                break;
-            case DRIVE_SET_UP_RAMP:
+            case DRIVE_3RD_ROW_POS:
                 if (!follower.isBusy()){
-                    follower.followPath(setUpRampPath, true);
-                    setPathStateOne(PathStateOne.INTAKE_RAMP);
-                }
-            case INTAKE_RAMP:
-                if (!follower.isBusy()) {
-                    Intake.intake.setPower(.8);
-                    follower.followPath(intakeRampPath, true);
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4){
-                    setPathStateOne(PathStateOne.DRIVE_RESET);
-                }
-                break;
-
-            case DRIVE_RESET:
-                if (!follower.isBusy()) {
-                    follower.followPath(driveReset, true);
-                    setPathStateOne(PathStateOne.SHOOT_RAMP);
-                }
-                break;
-            case DRIVE_SHOOT_RAMP_POSITION:
-                if (!follower.isBusy()){
-                    Shooter.setShooterPower(MEDIUM_SHOOT_SPEED);
-                    follower.followPath(shootRampPath);
-                    setPathStateOne(PathStateOne.SHOOT_RAMP);
-                }
-            case SHOOT_RAMP:
-                if (!follower.isBusy()){
-                    shootFromMedium();
-                }
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4) {
-                    timesRowIntaken++;
-                    if (timesRowIntaken < 3){
-                        setPathStateOne(PathStateOne.DRIVE_PREINTAKE_RAMP);
-                    } else if (timesRowIntaken == 3){
-                        setPathStateOne(PathStateOne.DRIVE_PARK);
-                    }
-                }
-                break;
-            case DRIVE_1ST_ROW_POS: //Works
+                    turnOffSystems();
+                    follower.followPath(getIntoRowThree);
+                    setPathStateOne(PathStateOne.INTAKE_THIRD_ROW);
+                } break;
+            case INTAKE_THIRD_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getFirstRow, true);
-                    setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
+                    follower.followPath(getRowThree, true);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_THREE);
                 } break;
-            case SET_UP_LEVER_HIT:
+            case DRIVE_RESET_MID_THREE:
                 if (!follower.isBusy()){
-                    follower.followPath(readyToHitLever, true);
-                    setPathStateOne(PathStateOne.HIT_LEVER);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
+                    follower.followPath(resetBackThree);
+                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
+                    setPathStateOne(PathStateOne.SHOOT_THIRD_ROW);
                 } break;
-            case HIT_LEVER:
-                if (!follower.isBusy()){
-                    follower.followPath(hitLever,.9,false);
-                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
-                }break;
-            case DRIVE_RESET_MID_ONE: // Works
-                if (!follower.isBusy()) {
-                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
-                    follower.followPath(resetBackOne, true);
-                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
-                    setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
-                } break;
-            case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.3){
-                    shootFromMediumEX();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
+            case SHOOT_THIRD_ROW:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
+                    shootFromMedium();
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4){
                     turnOffSystems();
+                    follower.followPath(park);
                     setPathStateOne(PathStateOne.DRIVE_PARK);
                 }
-                break;
             case DRIVE_PARK:
                 telemetry.addLine("All Paths Done");
                 break;
@@ -284,12 +267,10 @@ public class RedMain15Improved extends OpMode{
 
     public void init() {
         pathStateOne = PathStateOne.DRIVE_GETTING_INTO_SHOOT_POS;
-
         pathTimer = new Timer();
         opModeTimer = new Timer();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setPose(startPose);
 
         Intake.init(this);
         Shooter.init(this, false);
@@ -300,8 +281,6 @@ public class RedMain15Improved extends OpMode{
         buildPaths();
         follower.setPose(startPose);
 
-        timesRowIntaken = 0;
-
     }
 
     public void start(){
@@ -310,18 +289,19 @@ public class RedMain15Improved extends OpMode{
 
     public void loop(){
         follower.update();
-        autoCases();
-        updateTelemetry();
+        timerStages(opModeTimer);
+        telemetry.addData("Path State: ", pathStateOne.toString());
+        telemetry.addData("Path Time: ", pathTimer.getElapsedTimeSeconds());
+        telemetry.addData("Total Time: ", opModeTimer.getElapsedTimeSeconds());
     }
 
-    private void updateTelemetry() {
-        telemetry.addData("Auto Stage", pathStateOne.toString());
-        telemetry.addData("Shooter Velocity", Shooter.rightShooter.getVelocity());
-        telemetry.addData("Path Timer", pathTimer.getElapsedTimeSeconds());
-        telemetry.addData("OpMode Timer", opModeTimer.getElapsedTimeSeconds());
-        telemetry.update();
+    public void timerStages(Timer time){
+        if (opModeTimer.getElapsedTimeSeconds() < 30){
+            autoCases();
+        } else {
+            turnOffSystems();
+        }
     }
-
 
 
 

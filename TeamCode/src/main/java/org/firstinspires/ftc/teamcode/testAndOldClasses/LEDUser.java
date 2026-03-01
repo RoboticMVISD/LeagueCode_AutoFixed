@@ -1,38 +1,27 @@
-/*package org.firstinspires.ftc.teamcode.testClasses;
+package org.firstinspires.ftc.teamcode.testAndOldClasses;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class LEDUser {
+@TeleOp (name = "LEDTest")
+@Disabled
+public class LEDUser extends OpMode{
 
     OpMode op;
     Servo rgb;
-    ElapsedTime timer;
 
-
-    public void init(OpMode OP){
-        op = OP;
-        timer = new ElapsedTime();
-
+    @Override
+    public void init() {
+        op = this;
         rgb = op.hardwareMap.get(Servo.class, "LED");
-    }
-
-    public void start(){
-        timer.reset();
-        timer.startTime();
         rgb.setPosition(.5);
     }
 
+    @Override
     public void loop(){
-        rgbTimer();
     }
-    public  void rgbTimer(){
-        if (timer.seconds() > 60 && timer.seconds() < 100){
-            rgb.setPosition(.388);
-        } else if (timer.seconds()>100){
-            rgb.setPosition(.277);
-        }
-    }
+
+
 }
-*/

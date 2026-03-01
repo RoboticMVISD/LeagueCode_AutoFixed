@@ -8,19 +8,21 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
-import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-public class BetterLimelightAutoAim {
+public class AutoAim_Distance {
     static OpMode op;
 
     private static Limelight3A limelight;
+    public static DcMotor turretTracker;
+
 
     private static double kP = 0.0185;
     private static double kD = 0.0001;
@@ -56,6 +58,10 @@ public class BetterLimelightAutoAim {
 
         indicatorLight = op.hardwareMap.get(Servo.class, "LED");
 
+        turretTracker = op.hardwareMap.dcMotor.get("backLeft");
+        turretTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretTracker.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         limelight.pipelineSwitch(0);
 
         aimEnabled = false;
@@ -85,6 +91,8 @@ public class BetterLimelightAutoAim {
         } else {
             Shooter.setShooterPower(0);
         }
+
+        turretTrackerTelemetry();
     }
 
     public static void setkP(double newKP) {
@@ -250,5 +258,12 @@ public class BetterLimelightAutoAim {
         } else {
             indicatorLight.setPosition(0.180);
         }
+    }
+
+    //Turret Limits = -4900 (Right) && 8800 (Left)
+    private static void turretTrackerTelemetry(){
+        int ticks = 0;
+        ticks = turretTracker.getCurrentPosition();
+        op.telemetry.addData("Current Turret Pos: ", ticks);
     }
 }

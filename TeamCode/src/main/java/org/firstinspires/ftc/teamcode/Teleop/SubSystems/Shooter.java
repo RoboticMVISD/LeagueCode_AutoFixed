@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.CameraSystems.BetterLimelightAutoAim;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.CameraSystems.AutoAim_Distance;
+import org.firstinspires.ftc.teamcode.testAndOldClasses.Movement;
 
 public class Shooter {
     // --------- Making an OpMode object to use for hardware maps, gamepads, etc ------------ //
@@ -101,7 +101,7 @@ public class Shooter {
         RB = Turret Rotate right
          */
 
-        if (!BetterLimelightAutoAim.launcherRequested) {
+        if (!AutoAim_Distance.launcherRequested) {
             if (op.gamepad1.a) {
                 setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
             } else if (op.gamepad1.b) {
@@ -116,7 +116,7 @@ public class Shooter {
             setRotatorPower(-1);
         } else if (op.gamepad1.right_bumper) {
             setRotatorPower(1);
-        } else if (!BetterLimelightAutoAim.aimEnabled){
+        } else if (!AutoAim_Distance.aimEnabled){
             setRotatorPower(0);
         }
         }
@@ -132,7 +132,7 @@ public class Shooter {
         LT =  Turret rotates left
         RT = Turret rotates right
          */
-        if (!BetterLimelightAutoAim.launcherRequested){
+        if (!AutoAim_Distance.launcherRequested){
             if (op.gamepad2.a){
                setShooterPower(SPIN_UP_VELOCITY_SHORTRANGE);
             } else if (op.gamepad2.b){
@@ -150,7 +150,7 @@ public class Shooter {
             setRotatorPower(-.5);
         }else if (op.gamepad2.right_trigger > 0){
             setRotatorPower(.5);
-        } else if (!BetterLimelightAutoAim.aimEnabled){
+        } else if (!AutoAim_Distance.aimEnabled){
             setRotatorPower(0);
         }
 
@@ -174,7 +174,7 @@ public class Shooter {
         // Dpad L/R to change the Test Velocity by a Small increment
         // Dpad U/D to change the Test Velocity by a Large Increment
         // Increments can be changed above where the variables are created.
-        if (!BetterLimelightAutoAim.launcherRequested){
+        if (!AutoAim_Distance.launcherRequested){
              if (op.gamepad2.a){
             setShooterPower(TESTVELOCITY);
             } else if (op.gamepad2.dpadLeftWasPressed()){

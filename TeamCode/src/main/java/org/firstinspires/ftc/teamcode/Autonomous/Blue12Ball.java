@@ -10,14 +10,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.Movement;
+import org.firstinspires.ftc.teamcode.testAndOldClasses.Movement;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
 @Autonomous (name = "BlueAutoMain12")
-public class BlueAutoMainClose12 extends OpMode{
+public class Blue12Ball extends OpMode{
 
     /*
     How this auto will work code wise is that it will have three separate methods which hold case statements.

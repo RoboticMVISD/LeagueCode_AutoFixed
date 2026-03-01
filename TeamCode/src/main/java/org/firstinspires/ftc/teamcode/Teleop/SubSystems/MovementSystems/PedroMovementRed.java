@@ -73,7 +73,7 @@ public class PedroMovementRed {
                     gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
                     -gamepad1.right_stick_x * turnSpeedDamper,
-                    false // Robot Centric
+                    true // Robot Centric
             );
         }
     }
