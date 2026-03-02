@@ -9,7 +9,7 @@ public class FieldCentricDrive {
     private final Follower follower;
 
     // Optional speed scaling
-    private double driveSpeedMultiplier = 3;
+    private double driveSpeedMultiplier = 2;
     private double turnDamper = 1;
 
     public FieldCentricDrive(Follower follower) {

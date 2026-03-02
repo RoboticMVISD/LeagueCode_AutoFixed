@@ -38,7 +38,6 @@ public class AutoAim_Distance {
     private static int currentGoalTag;
     private static double currentGoalElevation;
     private static double currentGoalRange;
-    private static double ElevationInRadians;
     private static boolean noTagDetected;
     private static boolean refindTargetAttempted = false;
     private static boolean targetDataIsStale;
@@ -48,6 +47,8 @@ public class AutoAim_Distance {
     static double[] stepSizes = {0.1, 0.01, 0.001, 0.0001, 0.00001};
     static int stepIndex = 0;
     private static Servo indicatorLight;
+    private static int ticks;
+    private static Boolean goingToOtherBoundary, atRightBound, atLeftBound;
 
     private static final ElapsedTime timer = new ElapsedTime();
 
@@ -118,6 +119,18 @@ public class AutoAim_Distance {
         }
 
         if (noTagDetected) {
+            if (atRightBound && lastError < 0) {
+                if (!goingToOtherBoundary) {
+                    goToOtherBoundary();
+                }
+                return;
+            } else if (atLeftBound && lastError > 0) {
+                if (!goingToOtherBoundary) {
+                    goToOtherBoundary();
+                }
+                return;
+            }
+
             Shooter.setRotatorPower(0);
             lastError = 0;
 
@@ -133,6 +146,8 @@ public class AutoAim_Distance {
 
                 refindTargetAttempted = true;
             }
+
+            searchFunction();
 
             return;
         }
@@ -172,8 +187,8 @@ public class AutoAim_Distance {
                     currentGoalBearing = fiducial.getTargetXDegrees();
                     currentGoalElevation = fiducial.getTargetYDegrees();
                     goalX = fiducial.getTargetXPixels();
-                    ElevationInRadians = (currentGoalElevation * (PI / 180));
-                    currentGoalRange = ((30 - 11.5) / (tan(0 + ElevationInRadians)));
+                    double elevationInRadians = (currentGoalElevation * (PI / 180));
+                    currentGoalRange = ((30 - 11.5) / (tan(0 + elevationInRadians)));
 
                     noTagDetected = false;
                     targetDataIsStale = false;
@@ -262,8 +277,59 @@ public class AutoAim_Distance {
 
     //Turret Limits = -4900 (Right) && 8800 (Left)
     private static void turretTrackerTelemetry(){
-        int ticks = 0;
         ticks = turretTracker.getCurrentPosition();
+
+        if (ticks < -4800) {
+            atRightBound = true;
+            atLeftBound = false;
+        }
+        if (ticks > 8700) {
+            atLeftBound = true;
+            atRightBound = false;
+        }
+
         op.telemetry.addData("Current Turret Pos: ", ticks);
+    }
+
+    private static void goToOtherBoundary() {
+        goingToOtherBoundary = true;
+
+        if (ticks > 0) {
+            while (ticks < 8700 && noTagDetected) {
+                Shooter.setRotatorPower(0.8);
+            }
+            Shooter.setRotatorPower(0);
+        } else {
+            while (ticks > -4800 && noTagDetected) {
+                Shooter.setRotatorPower(-0.8);
+            }
+            Shooter.setRotatorPower(0);
+        }
+
+        goingToOtherBoundary = false;
+    }
+
+    private static void searchFunction() {
+        if (ticks > 3000) {
+            while (ticks > 3000) {
+                Shooter.setRotatorPower(-1);
+            }
+        } else if (ticks < -3000) {
+            while (ticks < -3000) {
+                Shooter.setRotatorPower(1);
+            }
+        }
+
+        while (aimEnabled && noTagDetected) {
+            if (ticks > 0) {
+                while (ticks > -3000) {
+                    Shooter.setRotatorPower(0.5);
+                }
+            } else {
+                while (ticks < 3000) {
+                    Shooter.setRotatorPower(-0.5);
+                }
+            }
+        }
     }
 }

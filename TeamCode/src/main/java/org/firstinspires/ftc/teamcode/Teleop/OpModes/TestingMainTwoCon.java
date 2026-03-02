@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.*;
 
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.CameraSystems.AutoAim_Distance;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Intake;
-import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.RedMovement;
+import org.firstinspires.ftc.teamcode.Teleop.SubSystems.MovementSystems.RedMove;
 import org.firstinspires.ftc.teamcode.Teleop.SubSystems.Shooter;
 
 
@@ -13,7 +13,7 @@ public class TestingMainTwoCon extends OpMode {
 
     Intake intake = new Intake();
     Shooter shooter = new Shooter();
-    RedMovement redMovement = new RedMovement();
+    RedMove redMovement = new RedMove();
     AutoAim_Distance autoAim = new AutoAim_Distance();
 
     @Override
