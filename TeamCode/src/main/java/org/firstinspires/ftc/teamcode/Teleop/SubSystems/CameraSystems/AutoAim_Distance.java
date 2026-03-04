@@ -24,11 +24,11 @@ public class AutoAim_Distance {
     public static DcMotor turretTracker;
 
 
-    private static double kP = 0.0185;
-    private static double kD = 0.0001;
+    private static double kP = 0.0181;
+    private static double kD = 0.0002;
     private static double goalX;
     private static double currentGoalBearing;
-    private static double lastError;
+    private static double lastError = 0 ;
     private static final double aimBoundary = 1;
     private static final double lockBoundary = 3;
     private static final double maxTurretPower = 1;
@@ -41,16 +41,17 @@ public class AutoAim_Distance {
     private static boolean noTagDetected;
     private static boolean refindTargetAttempted = false;
     private static boolean targetDataIsStale;
-    static final private double launchMultiplier = 2.5;
-    static final private double launchOffset = 756.68282;
-    private static double targetLaunchVelocity;
+    static final private double launchMultiplier = 2.45;
+    static final private double launchOffset = 806.68282;
+    public static double targetLaunchVelocity ;
     static double[] stepSizes = {0.1, 0.01, 0.001, 0.0001, 0.00001};
     static int stepIndex = 0;
     private static Servo indicatorLight;
     private static int ticks;
-    private static Boolean goingToOtherBoundary, atRightBound, atLeftBound;
+    private static Boolean inTeleop = false, goingToOtherBoundary = false, atRightBound = false, atLeftBound = false, atRightSearchBound = true, atLeftSearchBound = false;
 
-    private static final ElapsedTime timer = new ElapsedTime();
+    private static final ElapsedTime aimTimer = new ElapsedTime();
+    private static final ElapsedTime staleTimer = new ElapsedTime();
 
     public void init(OpMode OP) {
         op = OP;
@@ -63,6 +64,8 @@ public class AutoAim_Distance {
         turretTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretTracker.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        targetLaunchVelocity = 1000;
+
         limelight.pipelineSwitch(0);
 
         aimEnabled = false;
@@ -74,10 +77,10 @@ public class AutoAim_Distance {
         limelight.start();
     }
 
-    public void loop(boolean isOneCon) {
+    public void loop(boolean isOneCon, boolean isTeleop) {
         limelightDataAndTelemetry();
 
-        //autoDistanceLauncher();
+        inTeleop = isTeleop;
 
         if (isOneCon){
             conOneAutoAimAndDistanceControls();
@@ -89,7 +92,7 @@ public class AutoAim_Distance {
 
         if (launcherRequested) {
             autoDistanceLauncher();
-        } else {
+        } else if (!inTeleop){
             Shooter.setShooterPower(0);
         }
 
@@ -105,49 +108,57 @@ public class AutoAim_Distance {
     }
 
     public void resetTimer() {
-        timer.reset();
+        aimTimer.reset();
     }
 
     public static void update() throws InterruptedException {
-        double deltaTime = timer.seconds();
-        timer.reset();
+        double deltaTime = aimTimer.seconds();
+        aimTimer.reset();
 
         if (!aimEnabled) {
-            Shooter.setRotatorPower(0);
+            if (!inTeleop) {
+                Shooter.setRotatorPower(0);
+            }
             lastError = 0;
             return;
         }
 
         if (noTagDetected) {
-            if (atRightBound && lastError < 0) {
-                if (!goingToOtherBoundary) {
-                    goToOtherBoundary();
-                }
-                return;
-            } else if (atLeftBound && lastError > 0) {
-                if (!goingToOtherBoundary) {
-                    goToOtherBoundary();
-                }
+            if (((atRightBound && lastError < 0) || (atLeftBound && lastError > 0) || goingToOtherBoundary) && !refindTargetAttempted) {
+                    if (atRightBound) {
+                        goToOtherBoundary("Right");
+                    } else {
+                        goToOtherBoundary("Left");
+                    }
                 return;
             }
 
             Shooter.setRotatorPower(0);
             lastError = 0;
 
-            if (!refindTargetAttempted && targetDataIsStale) {
-                if (currentGoalElevation > 0) {
-                    Shooter.setRotatorPower(maxTurretPower);
-                } else {
-                    Shooter.setRotatorPower(-maxTurretPower);
+            if (targetDataIsStale) {
+                /*if (!refindTargetAttempted) {
+                    if (currentGoalElevation > 0) {
+                        Shooter.setRotatorPower(maxTurretPower);
+                    } else {
+                        Shooter.setRotatorPower(-maxTurretPower);
+                    }
+                    Thread.sleep(100);
+
+                    Shooter.setRotatorPower(0);
+
+                    refindTargetAttempted = true;
+
+                    return;
+                }*/
+
+                if (atLeftSearchBound) {
+                    searchFunction("Left");
+                } else if (atRightSearchBound) {
+                    searchFunction("Right");
                 }
-                Thread.sleep(100);
-
-                Shooter.setRotatorPower(0);
-
-                refindTargetAttempted = true;
             }
 
-            searchFunction();
 
             return;
         }
@@ -190,6 +201,7 @@ public class AutoAim_Distance {
                     double elevationInRadians = (currentGoalElevation * (PI / 180));
                     currentGoalRange = ((30 - 11.5) / (tan(0 + elevationInRadians)));
 
+                    staleTimer.reset();
                     noTagDetected = false;
                     targetDataIsStale = false;
                 }
@@ -198,7 +210,7 @@ public class AutoAim_Distance {
             noTagDetected = true;
         }
 
-        targetDataIsStale = result.getStaleness() > 250;
+        targetDataIsStale = staleTimer.milliseconds() > 500;
 
         op.telemetry.addData("Tag Detected", !noTagDetected);
 
@@ -223,6 +235,7 @@ public class AutoAim_Distance {
             launcherRequested = !launcherRequested;
         } else if (op.gamepad2.dpadUpWasPressed()) {
             aimEnabled = !aimEnabled;
+            staleTimer.reset();
         }
     }
 
@@ -231,10 +244,11 @@ public class AutoAim_Distance {
             launcherRequested = !launcherRequested;
         } else if (op.gamepad1.leftStickButtonWasPressed()) {
             aimEnabled = !aimEnabled;
+            staleTimer.reset();
         }
     }
 
-    private static void setLauncherPower() {
+    public static void setLauncherPower() {
         Shooter.leftShooter.setVelocity(targetLaunchVelocity);
         Shooter.rightShooter.setVelocity(targetLaunchVelocity);
     }
@@ -279,57 +293,47 @@ public class AutoAim_Distance {
     private static void turretTrackerTelemetry(){
         ticks = turretTracker.getCurrentPosition();
 
-        if (ticks < -4800) {
+        if (ticks < -4000) {
             atRightBound = true;
             atLeftBound = false;
         }
-        if (ticks > 8700) {
+        if (ticks > 9000) {
             atLeftBound = true;
             atRightBound = false;
+        }
+
+        if (ticks < -2500) {
+            atRightSearchBound = true;
+            atLeftSearchBound = false;
+        }
+        if (ticks > 2500) {
+            atLeftSearchBound = true;
+            atRightSearchBound = false;
         }
 
         op.telemetry.addData("Current Turret Pos: ", ticks);
     }
 
-    private static void goToOtherBoundary() {
+    private static void goToOtherBoundary(String lastBoundary) {
         goingToOtherBoundary = true;
 
-        if (ticks > 0) {
-            while (ticks < 8700 && noTagDetected) {
+        if (atLeftBound) {
                 Shooter.setRotatorPower(0.8);
-            }
-            Shooter.setRotatorPower(0);
         } else {
-            while (ticks > -4800 && noTagDetected) {
                 Shooter.setRotatorPower(-0.8);
-            }
-            Shooter.setRotatorPower(0);
         }
 
-        goingToOtherBoundary = false;
+        if ((lastBoundary == "Left" && !atLeftBound) || (lastBoundary == "Right" && !atRightBound)) {
+            goingToOtherBoundary = false;
+            refindTargetAttempted = true;
+        }
     }
 
-    private static void searchFunction() {
-        if (ticks > 3000) {
-            while (ticks > 3000) {
-                Shooter.setRotatorPower(-1);
-            }
-        } else if (ticks < -3000) {
-            while (ticks < -3000) {
-                Shooter.setRotatorPower(1);
-            }
-        }
-
-        while (aimEnabled && noTagDetected) {
-            if (ticks > 0) {
-                while (ticks > -3000) {
-                    Shooter.setRotatorPower(0.5);
-                }
-            } else {
-                while (ticks < 3000) {
-                    Shooter.setRotatorPower(-0.5);
-                }
-            }
+    private static void searchFunction(String lastSearchBoundary) {
+        if (lastSearchBoundary == "Left" && aimEnabled && noTagDetected) {
+                Shooter.setRotatorPower(0.5);
+        } else {
+                Shooter.setRotatorPower(-0.5);
         }
     }
 }

@@ -63,7 +63,7 @@ public class Red12Ball extends OpMode{
 
     //Variables To Shoot Second Row
     private final Pose rowTwoStart = new Pose(99.76036866359446, 56.866359447004605, Math.toRadians(0));
-    private final Pose rowTwoEnd = new Pose(132.54608294930875, 56.39631336405527, Math.toRadians(0));
+    private final Pose rowTwoEnd = new Pose(134.54608294930875, 56.39631336405527, Math.toRadians(0));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -72,9 +72,9 @@ public class Red12Ball extends OpMode{
     //Variables to shoot 3rd Row and Park
 
     private final Pose rowThreeStart = new Pose(99.76036866359446, 33.5529953917, Math.toRadians(0));
-    private final Pose rowThreeEnd = new Pose(133.04608294930875, 33.5529953917, Math.toRadians(0));
+    private final Pose rowThreeEnd = new Pose(134.54608294930875, 33.5529953917, Math.toRadians(0));
     private final Pose backUpSpot = new Pose(126.04878048780488, 33.5529953917, Math.toRadians(0));
-    private final Pose parkPose = new Pose(120, 70.57972350230413, Math.toRadians(0));
+    private final Pose parkPose = new Pose(120, 70.57972350230413, Math.toRadians(345));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
 
     private Timer pathTimer, opModeTimer;
@@ -127,9 +127,9 @@ public class Red12Ball extends OpMode{
                 setPathStateOne(PathStateOne.SHOOT_PRELOAD);
                 break;
             case SHOOT_PRELOAD: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.3){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     follower.followPath(getIntoRowOnePos, true);
                     setPathStateOne(PathStateOne.DRIVE_1ST_ROW_POS);
@@ -158,9 +158,9 @@ public class Red12Ball extends OpMode{
                     setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
                 } break;
             case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.3){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
                     shootFromMediumEX();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     setPathStateOne(PathStateOne.DRIVE_2ND_ROW_POS);
                 }
@@ -190,9 +190,9 @@ public class Red12Ball extends OpMode{
                     setPathStateOne(PathStateOne.SHOOT_SECOND_ROW);
                 } break;
             case SHOOT_SECOND_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.3){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     setPathStateOne(PathStateOne.DRIVE_3RD_ROW_POS);
                 } break;
@@ -216,9 +216,9 @@ public class Red12Ball extends OpMode{
                     setPathStateOne(PathStateOne.SHOOT_THIRD_ROW);
                 } break;
             case SHOOT_THIRD_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 4){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     follower.followPath(park);
                     setPathStateOne(PathStateOne.DRIVE_PARK);
@@ -258,7 +258,7 @@ public class Red12Ball extends OpMode{
         Intake.setBothIntakePower(0);
     }
     public void intakeBalls(Timer time){
-        Intake.intake.setPower(1);
+        Intake.intake.setPower(.8);
     }
 
 

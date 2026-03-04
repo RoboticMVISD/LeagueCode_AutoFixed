@@ -113,11 +113,14 @@ public class Shooter {
             }
 
         if (op.gamepad1.left_bumper) {
-            setRotatorPower(-1);
+            turretRotatorCR.setPower(-1);
+            turretRotatorCR2.setPower(-1);
         } else if (op.gamepad1.right_bumper) {
-            setRotatorPower(1);
+            turretRotatorCR2.setPower(1);
+            turretRotatorCR.setPower(1);
         } else if (!AutoAim_Distance.aimEnabled){
-            setRotatorPower(0);
+            turretRotatorCR.setPower(0);
+            turretRotatorCR2.setPower(0);
         }
         }
     }
@@ -147,9 +150,9 @@ public class Shooter {
         }
 
         if (op.gamepad2.left_trigger > 0){
-            setRotatorPower(-.5);
+            setRotatorPower(-1);
         }else if (op.gamepad2.right_trigger > 0){
-            setRotatorPower(.5);
+            setRotatorPower(1);
         } else if (!AutoAim_Distance.aimEnabled){
             setRotatorPower(0);
         }

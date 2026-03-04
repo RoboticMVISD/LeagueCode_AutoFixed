@@ -34,7 +34,7 @@ public class TestingMainOneCon extends OpMode {
     public void loop(){
         intake.loop();
         pedroMovementRed.loop();
-        autoAim.loop(true);
+        autoAim.loop(true, true);
 
         try {
             AutoAim_Distance.update();

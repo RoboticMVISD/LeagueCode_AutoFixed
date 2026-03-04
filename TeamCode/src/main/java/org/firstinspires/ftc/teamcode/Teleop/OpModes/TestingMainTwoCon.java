@@ -34,7 +34,13 @@ public class TestingMainTwoCon extends OpMode {
     public void loop(){
         intake.loop();
         redMovement.loop();
-        autoAim.loop(false);
+        autoAim.loop(false, true);
+
+        try {
+            AutoAim_Distance.update();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             shooter.loop();
