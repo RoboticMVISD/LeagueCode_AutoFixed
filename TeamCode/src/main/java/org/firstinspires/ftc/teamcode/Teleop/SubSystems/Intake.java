@@ -9,7 +9,7 @@ public class Intake {
     public static DcMotor intake, secondaryIntake;
 
     // ---------- Speed of Both Intakes ----------- //
-    final double INTAKE_MOTOR_SPEED = .75;
+    final double INTAKE_MOTOR_SPEED = .99;
 
 
     // -------- Initialization for intake system. Grabs from OpMode, maps the hardware ----------- //

@@ -6,7 +6,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,20 +16,19 @@ import org.firstinspires.ftc.teamcode.Autonomous.pedroPathing.Constants;
 
 
 //TIMES:
-@Autonomous (name = "BlueAutoMain12")
-@Disabled
-public class Blue12Ball extends OpMode{
+@Autonomous (name = "BlueAuto12")
+public class Blue12BallImproved extends OpMode{
 
     /*
     How this auto will work code wise is that it will have three separate methods which hold case statements.
     This is to symbolize the stages of the auto and what each stage completes/does.
      */
     private Follower follower;
-    private Boolean isShooting;
-    private Boolean stageOneBusy;
-    private Servo turretRotator;
+    public static Servo turretRotator;
 
-    //Enum For Shooting/Getting Preload and First Row of Balls. As well as all the variables used for it
+
+
+    //Variables & Enum For Shooting/Getting Preload and First Row of Balls
     private enum PathStateOne {
         DRIVE_GETTING_INTO_SHOOT_POS,
         SHOOT_PRELOAD,
@@ -38,50 +36,45 @@ public class Blue12Ball extends OpMode{
         HIT_LEVER,
         SET_UP_LEVER_HIT,
         DRIVE_RESET_MID_ONE,
-        SHOOT_FIRST_ROW;
-
-    }
-    private PathStateOne pathStateOne;
-    private final Pose startPose = new Pose(32.074, 111.92626728110596, Math.toRadians(180));
-    private final Pose shootPose = new Pose(55, 98, Math.toRadians(130));
-    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(125));
-    private final Pose preHitLever = new Pose(45.5, 70.57972350230413, Math.toRadians(90));
-    private final Pose hitLeverPose = new Pose(29.5, 70.57972350230413, Math.toRadians(90));
-    private final Pose rowOneStart = new Pose(56, 82.57972350230413, Math.toRadians(180));
-    private final Pose rowOneEnd = new Pose(34.5, 82.57972350230413  , Math.toRadians(180));
-    private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
-
-
-
-    //Enum To Shoot Second Row
-    private enum PathStateTwo {
+        SHOOT_FIRST_ROW,
         DRIVE_2ND_ROW_POS,
         INTAKE_2ND_ROW,
         DRIVE_BACK_ROW_TWO,
         DRIVE_RESET_MID_TWO,
-        SHOOT_SECOND_ROW
+        SHOOT_SECOND_ROW,
+        DRIVE_3RD_ROW_POS,
+        DRIVE_RESET_MID_THREE,
+        INTAKE_THIRD_ROW,
+        SHOOT_THIRD_ROW,
+        DRIVE_PARK;
+
     }
-    private PathStateTwo pathStateTwo;
-    private final Pose rowTwoStart = new Pose(56, 58.866359447004605, Math.toRadians(180));
-    private final Pose rowTwoEnd = new Pose(26.954, 58.39631336405527, Math.toRadians(180));
+    private PathStateOne pathStateOne;
+    private final Pose startPose = new Pose(32.074, 109.92626728110596, Math.toRadians(180));
+    private final Pose shootPose = new Pose(55, 98, Math.toRadians(140));
+    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(140));
+    private final Pose preHitLever = new Pose(45.5, 70.57972350230413, Math.toRadians(180));
+    private final Pose hitLeverPose = new Pose(29.5, 70.57972350230413, Math.toRadians(180));
+    private final Pose rowOneStart = new Pose(58, 80.57972350230413, Math.toRadians(180));
+    private final Pose rowOneEnd = new Pose(30.5, 80.57972350230413  , Math.toRadians(180));
+    private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
+
+
+
+    //Variables To Shoot Second Row
+    private final Pose rowTwoStart = new Pose(58, 56.866359447004605, Math.toRadians(180));
+    private final Pose rowTwoEnd = new Pose(20.954, 56.39631336405527, Math.toRadians(180));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
 
 
-    //Enum to shoot 3rd Row and Park
-    private enum PathStateThree {
-        DRIVE_3RD_ROW_POS,
-        DRIVE_RESET_MID_THREE,
-        INTAKE_THIRD_ROW,
-        SHOOT_THIRD_ROW,
-        DRIVE_PARK
-    }
-    private PathStateThree pathStateThree;
-    private final Pose rowThreeStart = new Pose(56, 35.5529953917, Math.toRadians(180));
-    private final Pose rowThreeEnd = new Pose(26.954, 35.5529953917, Math.toRadians(180));
+    //Variables to shoot 3rd Row and Park
+
+    private final Pose rowThreeStart = new Pose(58, 33.5529953917, Math.toRadians(180));
+    private final Pose rowThreeEnd = new Pose(20.954, 33.5529953917, Math.toRadians(180));
     private final Pose backUpSpot = new Pose(17.952, 33.5529953917, Math.toRadians(180));
-    private final Pose parkPose = new Pose(44.5, 63.82047685834502, Math.toRadians(270));
+    private final Pose parkPose = new Pose(45.5, 70.57972350230413, Math.toRadians(180));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
 
     private Timer pathTimer, opModeTimer;
@@ -126,7 +119,7 @@ public class Blue12Ball extends OpMode{
     }
 
     //Method/Switch statement for shooting preload and getting row one & shooting. WORKS
-    private void pathStateUpdateOne(){
+    private void autoCases(){
         switch (pathStateOne) {
             case DRIVE_GETTING_INTO_SHOOT_POS:
                 Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
@@ -144,17 +137,17 @@ public class Blue12Ball extends OpMode{
             case DRIVE_1ST_ROW_POS: //Works
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getFirstRow, .4, true);
+                    follower.followPath(getFirstRow, true);
                     setPathStateOne(PathStateOne.SET_UP_LEVER_HIT);
                 } break;
             case SET_UP_LEVER_HIT:
                 if (!follower.isBusy()){
-                    follower.followPath(readyToHitLever,.85, true);
+                    follower.followPath(readyToHitLever, true);
                     setPathStateOne(PathStateOne.HIT_LEVER);
                 } break;
             case HIT_LEVER:
                 if (!follower.isBusy()){
-                    follower.followPath(hitLever,.85,true);
+                    follower.followPath(hitLever,.8,false);
                     setPathStateOne(PathStateOne.DRIVE_RESET_MID_ONE);
                 }break;
             case DRIVE_RESET_MID_ONE: // Works
@@ -165,88 +158,70 @@ public class Blue12Ball extends OpMode{
                     setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
                 } break;
             case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
                     shootFromMediumEX();
-                } else {
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
+                    setPathStateOne(PathStateOne.DRIVE_2ND_ROW_POS);
                 }
                 break;
-            default:
-                turnOffSystems();
-                break;
-        }
-    } // WORKS
-
-    //Method/Case statement meant for the 2nd row of balls and shooting them
-    private void pathStateUpdateTwo(){
-        switch(pathStateTwo){
             case DRIVE_2ND_ROW_POS:  //Works
                 if (!follower.isBusy()){
                     turnOffSystems();
                     follower.followPath(getIntoRowTwo, true);
-                    setPathStateTwo(PathStateTwo.INTAKE_2ND_ROW);
+                    setPathStateOne(PathStateOne.INTAKE_2ND_ROW);
                 } break;
             case INTAKE_2ND_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getRowTwo, .5 , true);
-                    setPathStateTwo(PathStateTwo.DRIVE_BACK_ROW_TWO);
+                    follower.followPath(getRowTwo, true);
+                    setPathStateOne(PathStateOne.DRIVE_BACK_ROW_TWO);
                 } break;
             case DRIVE_BACK_ROW_TWO:
                 if (!follower.isBusy()){
                     follower.followPath(backUpRowTwo, true);
-                    setPathStateTwo(PathStateTwo.DRIVE_RESET_MID_TWO);
-                    Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_TWO);
                 }break;
             case DRIVE_RESET_MID_TWO:
                 if (!follower.isBusy()) {
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                     follower.followPath(resetBackTwo, true);
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
-                    setPathStateTwo(PathStateTwo.SHOOT_SECOND_ROW);
+                    setPathStateOne(PathStateOne.SHOOT_SECOND_ROW);
                 } break;
             case SHOOT_SECOND_ROW:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
-                    shootFromMediumEX();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5){
+                    shootFromMedium();
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
-                    pathStateUpdateThree();
+                    setPathStateOne(PathStateOne.DRIVE_3RD_ROW_POS);
                 } break;
-            default:
-                turnOffSystems();
-                break;
-        }
-    } // WORKS
-
-    //The last method that grabs the last row, shoots and parks in the middle. WORKS
-    private void pathStateUpdateThree(){
-        switch (pathStateThree){
             case DRIVE_3RD_ROW_POS:
                 if (!follower.isBusy()){
                     turnOffSystems();
                     follower.followPath(getIntoRowThree);
-                    setPathStateThree(PathStateThree.INTAKE_THIRD_ROW);
+                    setPathStateOne(PathStateOne.INTAKE_THIRD_ROW);
                 } break;
             case INTAKE_THIRD_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
-                    follower.followPath(getRowThree, .6, true);
-                    setPathStateThree(PathStateThree.DRIVE_RESET_MID_THREE);
+                    follower.followPath(getRowThree, true);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_THREE);
                 } break;
             case DRIVE_RESET_MID_THREE:
                 if (!follower.isBusy()){
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
                     follower.followPath(resetBackThree);
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
-                    setPathStateThree(PathStateThree.SHOOT_THIRD_ROW);
+                    setPathStateOne(PathStateOne.SHOOT_THIRD_ROW);
                 } break;
             case SHOOT_THIRD_ROW:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 4.5){
-                    shootFromMediumEX();
-                } else if (!follower.isBusy()){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
+                    shootFromMedium();
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
                     turnOffSystems();
                     follower.followPath(park);
-                    setPathStateThree(PathStateThree.DRIVE_PARK);
+                    setPathStateOne(PathStateOne.DRIVE_PARK);
                 }
             case DRIVE_PARK:
                 telemetry.addLine("All Paths Done");
@@ -255,35 +230,24 @@ public class Blue12Ball extends OpMode{
                 turnOffSystems();
                 break;
         }
-    } //WORKS
-
-
-
+    }
 
     private void setPathStateOne(PathStateOne newState) {
         pathStateOne = newState;
         pathTimer.resetTimer();
     }
-    private void setPathStateTwo(PathStateTwo newState) {
-        pathStateTwo = newState;
-        pathTimer.resetTimer();
-    }
-    private void setPathStateThree(PathStateThree newState) {
-        pathStateThree = newState;
-        pathTimer.resetTimer();
-    }
     private void shootFromMedium() {
-        double speed = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(speed, .75, turretRotator);
+        double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
+        Shooter.setShooterPower(spped, .6, turretRotator);
 
-        if (Shooter.rightShooter.getVelocity() > speed - 40 && Shooter.rightShooter.getVelocity() < speed + 40){
+        if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
         }
     }
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .85, turretRotator);
+        Shooter.setShooterPower(spped, .57, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -293,15 +257,8 @@ public class Blue12Ball extends OpMode{
         Shooter.setShooterPower(0);
         Intake.setBothIntakePower(0);
     }
-    public void setMaxMotorPower(double motorPower){
-        follower.drivetrain.setMaxPowerScaling(motorPower);
-    }
-
-    private void setTimeForCompletion(double timeForCompletionHolder){
-        timeForCompletionHolder = opModeTimer.getElapsedTimeSeconds();
-    }
     public void intakeBalls(Timer time){
-        Intake.intake.setPower(1);
+        Intake.intake.setPower(.8);
     }
 
 
@@ -310,13 +267,8 @@ public class Blue12Ball extends OpMode{
 
     public void init() {
         pathStateOne = PathStateOne.DRIVE_GETTING_INTO_SHOOT_POS;
-        pathStateTwo = PathStateTwo.DRIVE_2ND_ROW_POS;
-        pathStateThree = PathStateThree.DRIVE_3RD_ROW_POS;
-
         pathTimer = new Timer();
         opModeTimer = new Timer();
-
-        isShooting = false;
 
         follower = Constants.createFollower(hardwareMap);
 
@@ -324,9 +276,11 @@ public class Blue12Ball extends OpMode{
         Shooter.init(this, false);
         Movement.init(this.hardwareMap);
         turretRotator = this.hardwareMap.servo.get("turretRotator");
+        turretRotator.setDirection(Servo.Direction.FORWARD);
 
         buildPaths();
         follower.setPose(startPose);
+
     }
 
     public void start(){
@@ -342,13 +296,9 @@ public class Blue12Ball extends OpMode{
     }
 
     public void timerStages(Timer time){
-        if (opModeTimer.getElapsedTimeSeconds() < 11){
-            pathStateUpdateOne();
-        }else if (opModeTimer.getElapsedTimeSeconds() > 11 && opModeTimer.getElapsedTimeSeconds() < 19){
-            pathStateUpdateTwo();
-        }else if (opModeTimer.getElapsedTimeSeconds() > 19 && opModeTimer.getElapsedTimeSeconds() < 28){
-            pathStateUpdateThree();
-        }else {
+        if (opModeTimer.getElapsedTimeSeconds() < 30){
+            autoCases();
+        } else {
             turnOffSystems();
         }
     }

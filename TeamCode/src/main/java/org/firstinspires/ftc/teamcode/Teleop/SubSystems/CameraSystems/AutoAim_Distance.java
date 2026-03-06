@@ -24,8 +24,8 @@ public class AutoAim_Distance {
     public static DcMotor turretTracker;
 
 
-    private static double kP = 0.0181;
-    private static double kD = 0.0002;
+    private static double kP = 0.0172;
+    private static double kD = 0.0001;
     private static double goalX;
     private static double currentGoalBearing;
     private static double lastError = 0 ;
@@ -33,7 +33,7 @@ public class AutoAim_Distance {
     private static final double lockBoundary = 3;
     private static final double maxTurretPower = 1;
     private static double turretPower = 0;
-    public static boolean aimEnabled;
+    public static boolean aimEnabled, searchEnabled;
     public static boolean launcherRequested;
     private static int currentGoalTag;
     private static double currentGoalElevation;
@@ -41,14 +41,15 @@ public class AutoAim_Distance {
     private static boolean noTagDetected;
     private static boolean refindTargetAttempted = false;
     private static boolean targetDataIsStale;
-    static final private double launchMultiplier = 2.45;
-    static final private double launchOffset = 806.68282;
+    static final private double launchMultiplier = 2.40;
+    static final private double launchOffset = 756.68282;
     public static double targetLaunchVelocity ;
     static double[] stepSizes = {0.1, 0.01, 0.001, 0.0001, 0.00001};
     static int stepIndex = 0;
     private static Servo indicatorLight;
     private static int ticks;
-    private static Boolean inTeleop = false, goingToOtherBoundary = false, atRightBound = false, atLeftBound = false, atRightSearchBound = true, atLeftSearchBound = false;
+    private static boolean inTeleop = false, goingToOtherBoundary = false, atRightBound = false, atLeftBound = false, atRightSearchBound = true, atLeftSearchBound = false;
+    private static boolean assignedRotateDirection;
 
     private static final ElapsedTime aimTimer = new ElapsedTime();
     private static final ElapsedTime staleTimer = new ElapsedTime();
@@ -71,6 +72,7 @@ public class AutoAim_Distance {
         aimEnabled = false;
         launcherRequested = false;
         currentGoalTag = -1;
+        searchEnabled = false;
         /*
          * Starts polling for data.
          */
@@ -84,6 +86,7 @@ public class AutoAim_Distance {
 
         if (isOneCon){
             conOneAutoAimAndDistanceControls();
+            searchEnabled = true;
         } else {
             conTwoAutoAimAndDistanceControls();
         }
@@ -117,6 +120,8 @@ public class AutoAim_Distance {
 
         if (!aimEnabled) {
             if (!inTeleop) {
+                quickStopRotator();
+
                 Shooter.setRotatorPower(0);
             }
             lastError = 0;
@@ -125,16 +130,13 @@ public class AutoAim_Distance {
 
         if (noTagDetected) {
             if (((atRightBound && lastError < 0) || (atLeftBound && lastError > 0) || goingToOtherBoundary) && !refindTargetAttempted) {
-                    if (atRightBound) {
+                    /*if (atRightBound) {
                         goToOtherBoundary("Right");
                     } else {
                         goToOtherBoundary("Left");
                     }
-                return;
+                return;*/
             }
-
-            Shooter.setRotatorPower(0);
-            lastError = 0;
 
             if (targetDataIsStale) {
                 /*if (!refindTargetAttempted) {
@@ -151,14 +153,21 @@ public class AutoAim_Distance {
 
                     return;
                 }*/
-
-                if (atLeftSearchBound) {
-                    searchFunction("Left");
-                } else if (atRightSearchBound) {
-                    searchFunction("Right");
+                if (searchEnabled) {
+                    if (atLeftSearchBound) {
+                        searchFunction("Left");
+                    } else if (atRightSearchBound) {
+                        searchFunction("Right");
+                    }
                 }
+
+                return;
             }
 
+            quickStopRotator();
+
+            Shooter.setRotatorPower(0);
+            lastError = 0;
 
             return;
         }
@@ -166,6 +175,8 @@ public class AutoAim_Distance {
         double error = currentGoalBearing;
         double pTerm = error * kP;
         refindTargetAttempted = false;
+        goingToOtherBoundary = false;
+        assignedRotateDirection = false;
 
         double dTerm = 0;
         if (deltaTime > 0) {
@@ -236,6 +247,8 @@ public class AutoAim_Distance {
         } else if (op.gamepad2.dpadUpWasPressed()) {
             aimEnabled = !aimEnabled;
             staleTimer.reset();
+        } else if (op.gamepad2.dpadLeftWasPressed()) {
+            searchEnabled = !searchEnabled;
         }
     }
 
@@ -317,23 +330,38 @@ public class AutoAim_Distance {
     private static void goToOtherBoundary(String lastBoundary) {
         goingToOtherBoundary = true;
 
-        if (atLeftBound) {
+        if (atLeftBound && assignedRotateDirection == false) {
                 Shooter.setRotatorPower(0.8);
+                assignedRotateDirection = true;
         } else {
                 Shooter.setRotatorPower(-0.8);
+                assignedRotateDirection = true;
         }
 
         if ((lastBoundary == "Left" && !atLeftBound) || (lastBoundary == "Right" && !atRightBound)) {
             goingToOtherBoundary = false;
             refindTargetAttempted = true;
+            assignedRotateDirection = false;
         }
     }
 
     private static void searchFunction(String lastSearchBoundary) {
         if (lastSearchBoundary == "Left" && aimEnabled && noTagDetected) {
-                Shooter.setRotatorPower(0.5);
+                Shooter.setRotatorPower(0.25);
         } else {
-                Shooter.setRotatorPower(-0.5);
+                Shooter.setRotatorPower(-0.25);
+        }
+
+        if (!noTagDetected) {
+            quickStopRotator();
+        }
+    }
+
+    private static void quickStopRotator() {
+        if (Shooter.turretRotatorCR.getPower() > 0) {
+            Shooter.setRotatorPower(-0.001);
+        } else {
+            Shooter.setRotatorPower(0.001);
         }
     }
 }
