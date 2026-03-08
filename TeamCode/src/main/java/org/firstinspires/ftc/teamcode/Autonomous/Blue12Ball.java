@@ -274,7 +274,7 @@ public class Blue12Ball extends OpMode{
     }
     private void shootFromMedium() {
         double speed = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(speed, .75, turretRotator);
+        Shooter.setShooterPower(speed, .15, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > speed - 40 && Shooter.rightShooter.getVelocity() < speed + 40){
             Intake.setBothIntakePower(1);
@@ -283,7 +283,7 @@ public class Blue12Ball extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .85, turretRotator);
+        Shooter.setShooterPower(spped, .2, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);

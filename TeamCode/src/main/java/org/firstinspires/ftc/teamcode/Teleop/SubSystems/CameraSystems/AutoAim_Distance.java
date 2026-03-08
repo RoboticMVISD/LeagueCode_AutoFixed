@@ -24,8 +24,8 @@ public class AutoAim_Distance {
     public static DcMotor turretTracker;
 
 
-    private static double kP = 0.0172;
-    private static double kD = 0.0001;
+    private static double kP = 0.0141;
+    private static double kD = 0.0002;
     private static double goalX;
     private static double currentGoalBearing;
     private static double lastError = 0 ;
@@ -41,8 +41,8 @@ public class AutoAim_Distance {
     private static boolean noTagDetected;
     private static boolean refindTargetAttempted = false;
     private static boolean targetDataIsStale;
-    static final private double launchMultiplier = 2.40;
-    static final private double launchOffset = 756.68282;
+    static final private double launchMultiplier = 2.30;
+    static final private double launchOffset = 836.68282;
     public static double targetLaunchVelocity ;
     static double[] stepSizes = {0.1, 0.01, 0.001, 0.0001, 0.00001};
     static int stepIndex = 0;
@@ -89,6 +89,7 @@ public class AutoAim_Distance {
             searchEnabled = true;
         } else {
             conTwoAutoAimAndDistanceControls();
+            searchEnabled = false;
         }
 
         indicatorController();
@@ -159,9 +160,9 @@ public class AutoAim_Distance {
                     } else if (atRightSearchBound) {
                         searchFunction("Right");
                     }
-                }
 
-                return;
+                    return;
+                }
             }
 
             quickStopRotator();
@@ -221,7 +222,7 @@ public class AutoAim_Distance {
             noTagDetected = true;
         }
 
-        targetDataIsStale = staleTimer.milliseconds() > 500;
+        targetDataIsStale = staleTimer.milliseconds() > 1000;
 
         op.telemetry.addData("Tag Detected", !noTagDetected);
 
@@ -247,8 +248,6 @@ public class AutoAim_Distance {
         } else if (op.gamepad2.dpadUpWasPressed()) {
             aimEnabled = !aimEnabled;
             staleTimer.reset();
-        } else if (op.gamepad2.dpadLeftWasPressed()) {
-            searchEnabled = !searchEnabled;
         }
     }
 

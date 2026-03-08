@@ -45,25 +45,26 @@ public class Blue12BallImproved extends OpMode{
         DRIVE_3RD_ROW_POS,
         DRIVE_RESET_MID_THREE,
         INTAKE_THIRD_ROW,
+        BACK_UP_ROW_THREE,
         SHOOT_THIRD_ROW,
         DRIVE_PARK;
 
     }
     private PathStateOne pathStateOne;
     private final Pose startPose = new Pose(32.074, 109.92626728110596, Math.toRadians(180));
-    private final Pose shootPose = new Pose(55, 98, Math.toRadians(140));
-    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(140));
+    private final Pose shootPose = new Pose(55, 98, Math.toRadians(160));
+    private final Pose shootPoseEX = new Pose(47.5, 98.032, Math.toRadians(157));
     private final Pose preHitLever = new Pose(45.5, 70.57972350230413, Math.toRadians(180));
-    private final Pose hitLeverPose = new Pose(29.5, 70.57972350230413, Math.toRadians(180));
+    private final Pose hitLeverPose = new Pose(29.5, 71.57972350230413, Math.toRadians(180));
     private final Pose rowOneStart = new Pose(58, 80.57972350230413, Math.toRadians(180));
-    private final Pose rowOneEnd = new Pose(30.5, 80.57972350230413  , Math.toRadians(180));
+    private final Pose rowOneEnd = new Pose(31.5, 80.57972350230413  , Math.toRadians(180));
     private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
 
 
 
     //Variables To Shoot Second Row
     private final Pose rowTwoStart = new Pose(58, 56.866359447004605, Math.toRadians(180));
-    private final Pose rowTwoEnd = new Pose(20.954, 56.39631336405527, Math.toRadians(180));
+    private final Pose rowTwoEnd = new Pose(22.954, 56.39631336405527, Math.toRadians(180));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -71,11 +72,11 @@ public class Blue12BallImproved extends OpMode{
 
     //Variables to shoot 3rd Row and Park
 
-    private final Pose rowThreeStart = new Pose(58, 33.5529953917, Math.toRadians(180));
-    private final Pose rowThreeEnd = new Pose(20.954, 33.5529953917, Math.toRadians(180));
+    private final Pose rowThreeStart = new Pose(59, 33.5529953917, Math.toRadians(180));
+    private final Pose rowThreeEnd = new Pose(22.954, 33.5529953917, Math.toRadians(180));
     private final Pose backUpSpot = new Pose(17.952, 33.5529953917, Math.toRadians(180));
     private final Pose parkPose = new Pose(45.5, 70.57972350230413, Math.toRadians(180));
-    private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
+    private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park, backUpRowThree;
 
     private Timer pathTimer, opModeTimer;
 
@@ -114,7 +115,8 @@ public class Blue12BallImproved extends OpMode{
         //For Row Three and Park
         getIntoRowThree = newPathLine(shootPose,rowThreeStart);
         getRowThree = newPathLine(rowThreeStart, rowThreeEnd);
-        resetBackThree = newPathLine(rowThreeEnd, shootPoseEX);
+        resetBackThree = newPathLine(rowThreeStart, shootPoseEX);
+        backUpRowThree = newPathLine(rowThreeEnd, rowThreeStart);
         park = newPathLine(shootPose, parkPose);
     }
 
@@ -202,12 +204,18 @@ public class Blue12BallImproved extends OpMode{
                     follower.followPath(getIntoRowThree);
                     setPathStateOne(PathStateOne.INTAKE_THIRD_ROW);
                 } break;
+
             case INTAKE_THIRD_ROW:
                 if (!follower.isBusy()){
                     intakeBalls(pathTimer);
                     follower.followPath(getRowThree, true);
-                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_THREE);
+                    setPathStateOne(PathStateOne.BACK_UP_ROW_THREE);
                 } break;
+            case BACK_UP_ROW_THREE:
+                if (!follower.isBusy()){
+                    follower.followPath(backUpRowThree);
+                    setPathStateOne(PathStateOne.DRIVE_RESET_MID_THREE);
+                }
             case DRIVE_RESET_MID_THREE:
                 if (!follower.isBusy()){
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
@@ -247,7 +255,7 @@ public class Blue12BallImproved extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .57, turretRotator);
+        Shooter.setShooterPower(spped, .6, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -276,7 +284,7 @@ public class Blue12BallImproved extends OpMode{
         Shooter.init(this, false);
         Movement.init(this.hardwareMap);
         turretRotator = this.hardwareMap.servo.get("turretRotator");
-        turretRotator.setDirection(Servo.Direction.FORWARD);
+        turretRotator.setDirection(Servo.Direction.REVERSE);
 
         buildPaths();
         follower.setPose(startPose);

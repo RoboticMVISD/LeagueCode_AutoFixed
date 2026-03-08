@@ -53,8 +53,8 @@ public class Red12Ball extends OpMode{
     private final Pose startPose = new Pose(127.073732718894, 109.92626728110596, Math.toRadians(0));
     private final Pose shootPose = new Pose(102.230, 98.032, Math.toRadians(36));
     private final Pose shootPoseEX = new Pose(102.230, 98.032, Math.toRadians(38));
-    private final Pose preHitLever = new Pose(120, 70.57972350230413, Math.toRadians(0));
-    private final Pose hitLeverPose = new Pose(127.2, 70.57972350230413, Math.toRadians(0));
+    private final Pose preHitLever = new Pose(120, 70.97972350230413, Math.toRadians(0));
+    private final Pose hitLeverPose = new Pose(127.2, 70.97972350230413, Math.toRadians(0));
     private final Pose rowOneStart = new Pose(99.820, 80.57972350230413, Math.toRadians(0));
     private final Pose rowOneEnd = new Pose(126.50241820768138, 80.57972350230413  , Math.toRadians(0));
     private PathChain shootFirstThree, getIntoRowOnePos, getFirstRow, resetBackOne, hitLever, readyToHitLever;
@@ -63,7 +63,7 @@ public class Red12Ball extends OpMode{
 
     //Variables To Shoot Second Row
     private final Pose rowTwoStart = new Pose(99.76036866359446, 56.866359447004605, Math.toRadians(0));
-    private final Pose rowTwoEnd = new Pose(134.54608294930875, 56.39631336405527, Math.toRadians(0));
+    private final Pose rowTwoEnd = new Pose(133.54608294930875, 56.39631336405527, Math.toRadians(0));
     private  PathChain getIntoRowTwo, getRowTwo, resetBackTwo;
 
 
@@ -72,7 +72,7 @@ public class Red12Ball extends OpMode{
     //Variables to shoot 3rd Row and Park
 
     private final Pose rowThreeStart = new Pose(99.76036866359446, 33.5529953917, Math.toRadians(0));
-    private final Pose rowThreeEnd = new Pose(134.54608294930875, 33.5529953917, Math.toRadians(0));
+    private final Pose rowThreeEnd = new Pose(133.54608294930875, 33.5529953917, Math.toRadians(0));
     private final Pose backUpSpot = new Pose(126.04878048780488, 33.5529953917, Math.toRadians(0));
     private final Pose parkPose = new Pose(120, 70.57972350230413, Math.toRadians(345));
     private PathChain getIntoRowThree, getRowThree, backUpRowTwo,resetBackThree, park;
@@ -155,12 +155,13 @@ public class Red12Ball extends OpMode{
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
                     follower.followPath(resetBackOne, true);
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);//Works
+                    intakeBalls(pathTimer);
                     setPathStateOne(PathStateOne.SHOOT_FIRST_ROW);
                 } break;
             case SHOOT_FIRST_ROW: //Works
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3){
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.8){
                     shootFromMediumEX();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.8){
                     turnOffSystems();
                     setPathStateOne(PathStateOne.DRIVE_2ND_ROW_POS);
                 }
@@ -179,6 +180,7 @@ public class Red12Ball extends OpMode{
                 } break;
             case DRIVE_BACK_ROW_TWO:
                 if (!follower.isBusy()){
+                    intakeBalls(pathTimer);
                     follower.followPath(backUpRowTwo, true);
                     setPathStateOne(PathStateOne.DRIVE_RESET_MID_TWO);
                 }break;
@@ -187,12 +189,13 @@ public class Red12Ball extends OpMode{
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
                     follower.followPath(resetBackTwo, true);
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50);
+                    intakeBalls(pathTimer);
                     setPathStateOne(PathStateOne.SHOOT_SECOND_ROW);
                 } break;
             case SHOOT_SECOND_ROW:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5){
                     turnOffSystems();
                     setPathStateOne(PathStateOne.DRIVE_3RD_ROW_POS);
                 } break;
@@ -213,12 +216,13 @@ public class Red12Ball extends OpMode{
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
                     follower.followPath(resetBackThree);
                     Shooter.setShooterPower(Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE);
+                    intakeBalls(pathTimer);
                     setPathStateOne(PathStateOne.SHOOT_THIRD_ROW);
                 } break;
             case SHOOT_THIRD_ROW:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 3.5){
                     shootFromMedium();
-                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3){
+                } else if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 3.5){
                     turnOffSystems();
                     follower.followPath(park);
                     setPathStateOne(PathStateOne.DRIVE_PARK);
@@ -238,7 +242,7 @@ public class Red12Ball extends OpMode{
     }
     private void shootFromMedium() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .32, turretRotator);
+        Shooter.setShooterPower(spped, .15, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
@@ -247,7 +251,7 @@ public class Red12Ball extends OpMode{
 
     private void shootFromMediumEX() {
         double spped = Shooter.SPIN_UP_VELOCITY_MEDIUMRANGE - 50;
-        Shooter.setShooterPower(spped, .38, turretRotator);
+        Shooter.setShooterPower(spped, .2, turretRotator);
 
         if (Shooter.rightShooter.getVelocity() > spped - 40 && Shooter.rightShooter.getVelocity() < spped + 40){
             Intake.setBothIntakePower(1);
