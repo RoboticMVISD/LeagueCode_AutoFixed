@@ -14,10 +14,10 @@ public class driveTest extends OpMode {
 
     @Override
     public void init(){
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backRight = hardwareMap.dcMotor.get("backRight");
+        backLeft = hardwareMap.dcMotor.get("left_back");
+        frontLeft = hardwareMap.dcMotor.get("left_front");
+        frontRight = hardwareMap.dcMotor.get("right_front");
+        backRight = hardwareMap.dcMotor.get("right_back");
 
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
